@@ -1,9 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import * as productActions from "../redux/actions/productActions";
+import * as productActions from "../../redux/actions/productActions";
 import { bindActionCreators } from "redux";
-import Spinner from "./common/Spinner";
+import Spinner from "../common/Spinner";
 
 class ProductsPage extends React.Component {
   componentDidMount() {
@@ -42,7 +42,7 @@ ProductsPage.propTypes = {
   apiCallsInProgress: PropTypes.bool.isRequired,
 };
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state) {
   console.log(state);
   return {
     products: state.products,

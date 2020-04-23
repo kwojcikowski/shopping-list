@@ -3,7 +3,7 @@ import Header from "./common/Header";
 import { Route, Switch } from "react-router-dom";
 import HomePage from "./HomePage";
 import AboutPage from "./AboutPage";
-import ProductsPage from "./ProductsPage";
+import ProductsPage from "./products/ProductsPage";
 import PageNotFound from "./PageNotFound";
 
 function App() {
