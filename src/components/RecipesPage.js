@@ -1,6 +1,6 @@
 import React from "react";
 
-const AboutPage = () => (
+const RecipesPage = () => (
   <div>
     <h2>About</h2>
     <p>
@@ -9,4 +9,4 @@ const AboutPage = () => (
   </div>
 );
 
-export default AboutPage;
+export default RecipesPage;
