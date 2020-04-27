@@ -1,9 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import * as productActions from "../../redux/actions/productActions";
-import * as sectionsActions from "../../redux/actions/sectionsAction";
-import { bindActionCreators } from "redux";
 import Spinner from "../common/Spinner";
 import ProductsList from "./ProductsList";
 
@@ -29,7 +26,6 @@ class ProductsPage extends React.Component {
 ProductsPage.propTypes = {
   products: PropTypes.array.isRequired,
   sections: PropTypes.array.isRequired,
-  actions: PropTypes.object.isRequired,
   apiCallsInProgress: PropTypes.bool.isRequired,
 };
 

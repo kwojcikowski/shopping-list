@@ -1,27 +1,41 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import
+import {connect} from "react-redux";
+import PropTypes from 'prop-types';
+import Spinner from "../common/Spinner";
+import ProductsList from "../products/ProductsList";
 
-const ShoppingListPage = () => (
-  <div className="jumbotron">
-    <h1>Pluralsight Administration</h1>
-    <p>React, Redux and React Router for ultra-responsive web apps</p>
-    <Link to="about" className="btn btn-primary btn-lg">
-      Learn more
-    </Link>
-  </div>
-);
+const ShoppingListPage = ({apiCallsInProgress, cart}) => {
+
+    return (
+        <div className="jumbotron">
+            {console.log(apiCallsInProgress)}
+            <h3>Twoja lista zakupów</h3>
+            {apiCallsInProgress ? (
+                <Spinner />
+            ) : (
+                console.log(cart)
+            )}
+            {cart.map(entry => {
+                return (<div key={entry.uid} >{entry.productName}</div>)
+            })}
+        </div>);
+}
+
+ShoppingListPage.propTypes = {
+    cart: PropTypes.array.isRequired,
+    apiCallsInProgress: PropTypes.bool.isRequired,
+}
 
 const mapStateToProps = state => {
     return{
+        apiCallsInProgress: state.apiCallsInProgress > 0,
         cart: state.cart,
-        products: state.products,
-        section: state.section,
     }
 }
 
-const mapDispatchToProps = {
-
+function mapDispatchToProps(dispatch) {
+    return {};
 }
 
-export default ShoppingListPage;
+
+export default connect(mapStateToProps, mapDispatchToProps)(ShoppingListPage);
