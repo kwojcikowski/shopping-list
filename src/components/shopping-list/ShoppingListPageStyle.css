@@ -1,0 +1,51 @@
+.list {
+    margin: 20px auto;
+    background-color: #edf6ff
+}
+
+.listTitle {
+    padding: 30px;
+    text-align: center;
+}
+
+.optionsDiv {
+    margin: auto;
+    text-align: center;
+}
+
+.sortingDiv {
+    text-align: center;
+    margin: auto;
+    display: inline-block;
+    padding: 5px 15px;
+}
+
+.sortingLabel {
+    display: inline-block;
+    padding: 5px 10px;
+}
+
+.sortingSelect {
+    display: inline-block;
+}
+
+.editButton {
+    display: inline-block;
+}
+
+.listTable {
+    margin: 15px auto;
+    padding: 20px;
+}
+
+.sectionTitle {
+    text-align: center;
+}
+
+.listColumn {
+    padding: 0 10px;
+}
+
+.listRow {
+
+}

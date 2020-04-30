@@ -4,7 +4,7 @@ import SelectInput from "./SelectInput";
 import PropTypes from "prop-types";
 
 const AddProductForm = ({
-  products,
+  // products,
   sections,
   errors,
   saving,
@@ -49,7 +49,7 @@ const AddProductForm = ({
 };
 
 AddProductForm.propTypes = {
-  products: PropTypes.array.isRequired,
+  // products: PropTypes.array.isRequired,
   sections: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,

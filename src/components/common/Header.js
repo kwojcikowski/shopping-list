@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import AddProductForm from "./AddProductForm";
 import * as productActions from "../../redux/actions/productActions";
@@ -64,6 +64,10 @@ const Header = ({ sections, products, saveProduct }) => {
         {" | "}
         <NavLink to="/recipes" activeStyle={activeStyle}>
           Przepisy
+        </NavLink>
+        {" | "}
+        <NavLink to="/stores" activeStyle={activeStyle}>
+          Sklepy
         </NavLink>
       </nav>
       <button

@@ -10,10 +10,17 @@ import "react-toastify/dist/ReactToastify.css";
 import * as productActions from "../redux/actions/productActions";
 import * as sectionsActions from "../redux/actions/sectionsAction";
 import * as cartActions from "../redux/actions/cartActions";
+import * as supportedStoresActions from "../redux/actions/supportedStoresActions";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import StoresPage from "./stores/StoresPage";
 
-function App({ loadSections, loadProducts, loadCartProducts }) {
+function App({
+  loadSections,
+  loadProducts,
+  loadCartProducts,
+  loadSupportedStores,
+}) {
   useEffect(() => {
     loadSections().catch((error) => {
       alert("Nie udało się załadować działów :( " + error);
@@ -24,6 +31,9 @@ function App({ loadSections, loadProducts, loadCartProducts }) {
     loadCartProducts().catch((error) => {
       alert("Nie udało się załadować koszyka " + error);
     });
+    loadSupportedStores().catch((error) => {
+      alert("Nie udało się załadować sklepów " + error);
+    });
   }, []);
   return (
     <div>
@@ -32,6 +42,7 @@ function App({ loadSections, loadProducts, loadCartProducts }) {
         <Route exact path="/" component={ShoppingListPage} />
         <Route path="/recipes" component={RecipesPage} />
         <Route path="/products" component={ProductsPage} />
+        <Route path="/stores" component={StoresPage} />
         <Route component={PageNotFound} />
       </Switch>
       <ToastContainer />
@@ -43,6 +54,7 @@ App.propTypes = {
   loadProducts: PropTypes.func.isRequired,
   loadSections: PropTypes.func.isRequired,
   loadCartProducts: PropTypes.func.isRequired,
+  loadSupportedStores: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = () => {
@@ -53,6 +65,7 @@ const mapDispatchToProps = {
   loadProducts: productActions.loadProducts,
   loadSections: sectionsActions.loadSections,
   loadCartProducts: cartActions.loadCart,
+  loadSupportedStores: supportedStoresActions.loadSupportedStores,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

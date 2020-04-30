@@ -2,10 +2,8 @@ import React from "react";
 
 const RecipesPage = () => (
   <div>
-    <h2>About</h2>
-    <p>
-      This app uses React, Redux, React Router and many other helpful libraries.
-    </p>
+    <h2>Przepisy</h2>
+    <p>Wkrótce się pojawią! :)</p>
   </div>
 );
 

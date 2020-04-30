@@ -7,7 +7,7 @@ const weightUnit = {
 };
 const quantityUnit = {
   defaultUnit: "szt",
-  scale: [],
+  scale: new Map([["szt", 1]]),
 };
 const volumeUnit = {
   defaultUnit: "l",
@@ -66,9 +66,20 @@ export const evaluateBestUnit = (oldEntry, newEntry) => {
     newValue = candidate;
   }
   return {
+    ...oldEntry,
     uid: oldEntry.uid,
     productId: oldEntry.productId,
     unit,
     quantity: newValue,
   };
+};
+
+export const getAvailableUnits = () => {
+  let availableUnits = [];
+  for (let unitType of units) {
+    for (let key of unitType.scale.keys()) {
+      availableUnits.push(key);
+    }
+  }
+  return availableUnits;
 };
