@@ -1,10 +1,16 @@
 import React from "react";
 import "./ShoppingListPageStyle.css";
 import PropTypes from "prop-types";
-import InlineSelectInput from "../common/InlineSelectInput";
 import ShoppingProductWidget from "./ShoppingProductWidget";
+import * as cartActions from "../../redux/actions/cartActions";
+import {connect} from "react-redux";
 
-const ShoppingSectionWidget = ({ editable, section, products }) => {
+const ShoppingSectionWidget = ({ editable, section, products, deleteProductFromCart }) => {
+
+    const onProductDelete = (cartProduct) => {
+        deleteProductFromCart(cartProduct)
+    }
+
   return (
     <>
       <h4 className={"sectionTitle"}>{section}</h4>
@@ -13,7 +19,7 @@ const ShoppingSectionWidget = ({ editable, section, products }) => {
           {products.map((product) => {
             if (editable) {
               return (
-                <ShoppingProductWidget key={product.uid} product={product} />
+                <ShoppingProductWidget deleteProductFromCart={onProductDelete} key={product.uid} product={product} />
               );
             } else {
               return (
@@ -37,6 +43,15 @@ ShoppingSectionWidget.propTypes = {
   section: PropTypes.string.isRequired,
   products: PropTypes.array.isRequired,
   editable: PropTypes.bool.isRequired,
+    deleteProductFromCart: PropTypes.func.isRequired
 };
 
-export default ShoppingSectionWidget;
+const mapStateToProps = () => {
+    return {}
+}
+
+const mapDispatchToProps = {
+    deleteProductFromCart: cartActions.deleteProductFromCart
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ShoppingSectionWidget);

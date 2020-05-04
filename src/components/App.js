@@ -14,6 +14,7 @@ import * as supportedStoresActions from "../redux/actions/supportedStoresActions
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import StoresPage from "./stores/StoresPage";
+import ManageStore from "./stores/ManageStore";
 
 function App({
   loadSections,
@@ -42,6 +43,7 @@ function App({
         <Route exact path="/" component={ShoppingListPage} />
         <Route path="/recipes" component={RecipesPage} />
         <Route path="/products" component={ProductsPage} />
+        <Route path='/store/:slug' component={ManageStore} />
         <Route path="/stores" component={StoresPage} />
         <Route component={PageNotFound} />
       </Switch>

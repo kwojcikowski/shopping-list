@@ -51,11 +51,15 @@ export const alreadyExistsInCart = (cartEntry, cart) => {
   return null;
 };
 
-export const evaluateBestUnit = (oldEntry, newEntry) => {
+export const evaluateBestUnit = (oldEntry, newEntry= {}) => {
   const oldType = normalizeEntryUnit(oldEntry);
-  const newType = normalizeEntryUnit(newEntry);
+  let newValue = oldType.value;
+  if(Object.keys(newEntry).length !== 0){
+    console.log('Non empty')
+    const newType = normalizeEntryUnit(newEntry);
+    newValue += newType.value;
+  }
   const scale = oldType.scale;
-  let newValue = oldType.value + newType.value;
   let unit = oldType.unit;
   for (let [candidateUnit, multiplier] of scale.entries()) {
     let candidate = newValue / parseFloat(multiplier);

@@ -13,6 +13,18 @@ function updateProductInCartSuccess(cartEntry) {
   return { type: types.UPDATE_PRODUCT_IN_CART_SUCCESS, cartEntry };
 }
 
+function updateProductInCartLocallySuccess(cartEntry) {
+  return {type: types.UPDATE_PRODUCT_IN_CART_LOCALLY_SUCCESS, cartEntry};
+}
+
+function updateCartSuccess(cart){
+  return {type: types.UPDATE_CART_SUCCESS, cart}
+}
+
+function deleteProductFromCartSuccess(cartEntry) {
+  return {type: types.DELETE_PRODUCT_FROM_CART_SUCCESS, cartEntry}
+}
+
 export function loadCart() {
   return function (dispatch) {
     beginApiCall();
@@ -33,8 +45,8 @@ export function addProductToCart(cartEntry) {
     beginApiCall();
     return cartApi
       .addProductToCart(cartEntry)
-      .then(() => {
-        dispatch(addProductToCartSuccess(cartEntry));
+      .then((cartEntry) => {
+        dispatch(addProductToCartSuccess(cartEntry[0]));
       })
       .catch((error) => {
         dispatch(apiCallError(error));
@@ -56,4 +68,35 @@ export function updateProductInCart(cartEntry) {
         throw error;
       });
   };
+}
+
+export function updateProductInCartLocally(cartEntry) {
+  return function(dispatch) {
+    return dispatch(updateProductInCartLocallySuccess(cartEntry));
+  }
+}
+
+export function updateCart(cart) {
+  return function(dispatch) {
+    return cartApi
+        .updateCart(cart)
+        .then(() => {
+          dispatch(updateCartSuccess(cart))
+        })
+        .catch(error => {
+          dispatch(apiCallError(error));
+          throw error;
+        })
+  }
+}
+
+export function deleteProductFromCart(cartEntry) {
+  return function(dispatch) {
+    return cartApi.deleteProductFromCart(cartEntry).then(() => {
+        dispatch(deleteProductFromCartSuccess(cartEntry))
+    }).catch(error => {
+              dispatch(apiCallError(error));
+              throw error;
+            })
+  }
 }

@@ -5,11 +5,14 @@ import Spinner from "../common/Spinner";
 import ShoppingSectionWidget from "./ShoppingSectionWidget";
 import { groupBy, sortBy } from "underscore";
 import "./ShoppingListPageStyle.css";
+import * as cartActions from '../../redux/actions/cartActions'
 
 const ShoppingListPage = ({
+    cart,
   apiCallsInProgress,
   splitSections,
   supportedStores,
+    updateCart,
 }) => {
   const [editable, setEditable] = useState(false);
 
@@ -26,7 +29,12 @@ const ShoppingListPage = ({
           </select>
         </div>
         <button
-          onClick={() => setEditable(!editable)}
+          onClick={() => {
+            setEditable(!editable);
+            if(editable){
+              updateCart(cart)
+            }
+          }}
           className="btn btn-outline-primary editButton"
         >
           {editable ? "Zapisz" : "Edytuj listę zakupów"}
@@ -56,6 +64,7 @@ ShoppingListPage.propTypes = {
   apiCallsInProgress: PropTypes.bool.isRequired,
   splitSections: PropTypes.object.isRequired,
   supportedStores: PropTypes.array.isRequired,
+  updateCart: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => {
@@ -67,6 +76,8 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+  updateCart: cartActions.updateCart
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ShoppingListPage);

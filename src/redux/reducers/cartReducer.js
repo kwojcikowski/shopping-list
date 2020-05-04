@@ -5,6 +5,8 @@ export default function cartReducer(state = initialState.cart, action) {
   switch (action.type) {
     case types.LOAD_CART_SUCCESS:
       return action.cart;
+    case types.UPDATE_CART_SUCCESS:
+      return state;
     case types.ADD_TO_CART_SUCCESS:
       return [
         ...state,
@@ -19,6 +21,12 @@ export default function cartReducer(state = initialState.cart, action) {
       return state.map((entry) =>
         entry.uid === action.cartEntry.uid ? action.cartEntry : entry
       );
+    case types.UPDATE_PRODUCT_IN_CART_LOCALLY_SUCCESS:
+      return state.map((entry) =>
+          entry.uid === action.cartEntry.uid ? action.cartEntry : entry
+      );
+    case types.DELETE_PRODUCT_FROM_CART_SUCCESS:
+      return state.filter(entry => entry.uid !== action.cartEntry.uid)
     default:
       return state;
   }

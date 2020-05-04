@@ -8,10 +8,18 @@ const InlineSelectInput = ({
   value,
   error,
   options,
+  style,
+  onBlur,
 }) => {
   return (
     <div>
-      <select name={name} value={value} onChange={onChange}>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        style={style}
+      >
         <option value={value}>{defaultOption}</option>
         {options.map((option) => {
           return (
@@ -33,6 +41,8 @@ InlineSelectInput.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   error: PropTypes.string,
   options: PropTypes.arrayOf(PropTypes.string),
+  onBlur: PropTypes.func,
+  style: PropTypes.object,
 };
 
 export default InlineSelectInput;

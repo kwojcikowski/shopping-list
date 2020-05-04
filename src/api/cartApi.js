@@ -19,8 +19,30 @@ export function updateProductInCart(cartEntry) {
   const { uid, productId, unit, quantity } = cartEntry;
   return fetch(
     baseUrl +
-      `/update?uid=${uid}&productId=${productId}&unit=${unit}&quantity=${quantity}`
+      `/updateProduct?uid=${uid}&productId=${productId}&unit=${unit}&quantity=${quantity}`
   )
     .then(handleResponse)
     .catch(handleError);
+}
+
+export function updateCart(cart) {
+  let cartString = JSON.stringify(cart.map(entry => {
+    return {
+      uid: entry.uid,
+      productId: entry.productId,
+      unit: entry.unit,
+      quantity: entry.quantity
+    }
+  }))
+  return fetch(
+      baseUrl +
+      `/update?cart=${cartString.toString()}`
+  )
+      .then(handleResponse)
+      .catch(handleError);
+}
+
+export function deleteProductFromCart(cartEntry) {
+  const { uid } = cartEntry
+  return fetch(baseUrl + `/deleteProduct?uid=${uid}`).then(handleResponse).catch(handleError);
 }

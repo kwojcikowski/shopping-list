@@ -8,6 +8,10 @@ export default function supportedStoresReducer(
   switch (action.type) {
     case types.LOAD_SUPPORTED_STORES_SUCCESS:
       return action.supportedStores;
+    case types.UPDATE_STORE_ORDER_SUCCESS:
+      return state.map((store) =>
+        store.id === action.store.id ? action.store.id : store
+      );
     default:
       return state;
   }
