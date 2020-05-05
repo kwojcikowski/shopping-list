@@ -2,7 +2,7 @@ import initialState from "./initialState";
 import * as types from "../actions/actionTypes";
 
 export default function supportedStoresReducer(
-  state = initialState.products,
+  state = initialState.supportedStores,
   action
 ) {
   switch (action.type) {
@@ -11,6 +11,10 @@ export default function supportedStoresReducer(
     case types.UPDATE_STORE_ORDER_SUCCESS:
       return state.map((store) =>
         store.id === action.store.id ? action.store.id : store
+      );
+    case types.ADD_SECTION_TO_ORDER_SUCCESS:
+      return state.map((store) =>
+        store.id === action.store.id ? action.store : store
       );
     default:
       return state;

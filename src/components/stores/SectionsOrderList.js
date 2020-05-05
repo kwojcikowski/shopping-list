@@ -1,8 +1,7 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import SectionCard from "./SectionCard";
 import update from "immutability-helper";
-import InlineSelectInput from "../common/InlineSelectInput";
 
 const orderContainer = {
   margin: "15px auto",
@@ -20,17 +19,21 @@ const saveOrderButton = {
   margin: "15px",
 };
 
-const SectionsOrderList = ({ order, onOrderSave, sections }) => {
+const SectionsOrderList = ({ order, onOrderSave, onSectionAdd, sections }) => {
   const [showAddPanel, setShowAddPanel] = useState(false);
-  const [sectionsOrder, setSectionsOrder] = useState(order);
-  const [sectionToAdd, setSectionToAdd] = useState({
-    section: sections[0].name,
-  });
+  const [sectionsOrder, setSectionsOrder] = useState([...order]);
+  const [sectionToAdd, setSectionToAdd] = useState({});
+
+  useEffect(() => {
+    setSectionsOrder([...order]);
+  }, [order]);
 
   const moveCard = useCallback(
     (dragIndex, hoverIndex) => {
-      console.log(sectionsOrder);
-      const dragSection = sectionsOrder[dragIndex];
+      const dragSection = {
+        ...sectionsOrder[dragIndex],
+        sectionOrder: hoverIndex,
+      };
       setSectionsOrder(
         update(sectionsOrder, {
           $splice: [
@@ -43,17 +46,17 @@ const SectionsOrderList = ({ order, onOrderSave, sections }) => {
     [sectionsOrder]
   );
 
-  const addSection = () => {
-    setSectionsOrder([sectionToAdd, ...sectionsOrder]);
+  const addSection = (event) => {
+    event.preventDefault();
+    onSectionAdd(sectionToAdd);
   };
 
   const onSelectChange = (event) => {
-    const { name, value } = event.target;
-    setSectionToAdd((prevSection) => {
-      return {
-        [name]: value,
-        ...prevSection,
-      };
+    setSectionToAdd({
+      ...sections.find(
+        (section) => section.id === parseInt(event.target.value)
+      ),
+      sectionOrder: sectionsOrder.length,
     });
   };
 
@@ -70,20 +73,24 @@ const SectionsOrderList = ({ order, onOrderSave, sections }) => {
               justifyContent: "center",
             }}
           >
-            <InlineSelectInput
+            <select
               name={"section"}
-              style={{ padding: "5px", margin: "0 15px" }}
+              value={sectionToAdd.id}
               onChange={onSelectChange}
-              options={sections.map((section) => section.name)}
-            />
+            >
+              {sections.map((section) => {
+                return (
+                  <option key={section.id} value={section.id}>
+                    {section.name}
+                  </option>
+                );
+              })}
+            </select>
             <button
               type="submit"
               className="btn btn-outline-success"
               style={{ display: "inline-block", textAlign: "center" }}
-              onClick={() => {
-                addSection();
-                setShowAddPanel(!showAddPanel);
-              }}
+              onClick={addSection}
             >
               Dodaj
             </button>
@@ -91,7 +98,7 @@ const SectionsOrderList = ({ order, onOrderSave, sections }) => {
         ) : (
           <button
             className="btn btn-outline-success"
-            onClick={() => setShowAddPanel(!showAddPanel)}
+            onClick={() => setShowAddPanel(true)}
           >
             Dodaj dział
           </button>
@@ -125,6 +132,7 @@ SectionsOrderList.propTypes = {
   order: PropTypes.array.isRequired,
   onOrderSave: PropTypes.func.isRequired,
   sections: PropTypes.array.isRequired,
+  onSectionAdd: PropTypes.func.isRequired,
 };
 
 export default SectionsOrderList;

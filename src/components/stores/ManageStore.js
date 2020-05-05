@@ -9,11 +9,13 @@ import Spinner from "../common/Spinner";
 import { DndProvider } from "react-dnd";
 import Backend from "react-dnd-html5-backend";
 import { toast } from "react-toastify";
+import { sortBy } from "underscore";
 
 const ManageStore = ({
   store,
   supportedStores,
   updateStoreOrder,
+  addSectionToOrder,
   sections,
 }) => {
   const [showLayout, setShowLayout] = useState(false);
@@ -24,14 +26,25 @@ const ManageStore = ({
     );
   };
 
+  const onSectionAdd = (section) => {
+    addSectionToOrder(section, store)
+      .then(() => {
+        toast.success(`Dział ${section.name} dodany.`);
+      })
+      .catch(() => {
+        toast.error("Dodawanie działu nie powiodło się.");
+      });
+  };
+
   if (supportedStores.length === 0) return <Spinner />;
   return (
     <>
       <h2>{store.fullName}</h2>
       <DndProvider backend={Backend}>
         <SectionsOrderList
-          order={store.order}
+          order={sortBy(store.order, "sectionOrder")}
           onOrderSave={onOrderSave}
+          onSectionAdd={onSectionAdd}
           sections={sections}
         />
       </DndProvider>
@@ -49,6 +62,7 @@ ManageStore.propTypes = {
   supportedStores: PropTypes.array.isRequired,
   updateStoreOrder: PropTypes.func.isRequired,
   sections: PropTypes.array.isRequired,
+  addSectionToOrder: PropTypes.func.isRequired,
 };
 
 const findStoreBySlug = (slug, supportedStores) => {
@@ -70,6 +84,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = {
   updateStoreOrder: supportedStoresActions.updateStoreOrder,
+  addSectionToOrder: supportedStoresActions.addSectionToOrder,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ManageStore);

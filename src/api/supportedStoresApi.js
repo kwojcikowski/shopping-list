@@ -5,6 +5,19 @@ export function loadSupportedStores() {
   return fetch(baseUrl).then(handleResponse).catch(handleError);
 }
 
+export function addSectionToOrder(section, store) {
+  return fetch(baseUrl + `/insertOrder`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      section: section,
+      store: store,
+    }),
+  })
+    .then(handleResponse)
+    .catch(handleError);
+}
+
 export function updateStoreOrder(store) {
   const orderString = JSON.stringify(
     store.order.map((entry) => {

@@ -10,6 +10,10 @@ function updateStoreOrderSuccess(store) {
   return { type: types.UPDATE_STORE_ORDER_SUCCESS, store };
 }
 
+function addSectionToOrderSuccess(store) {
+  return { type: types.ADD_SECTION_TO_ORDER_SUCCESS, store };
+}
+
 export function loadSupportedStores() {
   return function (dispatch) {
     dispatch(beginApiCall());
@@ -17,6 +21,21 @@ export function loadSupportedStores() {
       .loadSupportedStores()
       .then((supportedStores) => {
         dispatch(loadSupportedStoresSuccess(supportedStores));
+      })
+      .catch((error) => {
+        dispatch(apiCallError(error));
+        throw error;
+      });
+  };
+}
+
+export function addSectionToOrder(section, store) {
+  return function (dispatch) {
+    dispatch(beginApiCall());
+    return supportedStoresApi
+      .addSectionToOrder(section, store)
+      .then((response) => {
+        dispatch(addSectionToOrderSuccess(response));
       })
       .catch((error) => {
         dispatch(apiCallError(error));
