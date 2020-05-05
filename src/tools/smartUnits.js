@@ -51,28 +51,26 @@ export const alreadyExistsInCart = (cartEntry, cart) => {
   return null;
 };
 
-export const evaluateBestUnit = (oldEntry, newEntry= {}) => {
+export const evaluateBestUnit = (oldEntry, newEntry = {}) => {
   const oldType = normalizeEntryUnit(oldEntry);
   let newValue = oldType.value;
-  if(Object.keys(newEntry).length !== 0){
-    console.log('Non empty')
+  if (Object.keys(newEntry).length !== 0) {
     const newType = normalizeEntryUnit(newEntry);
     newValue += newType.value;
   }
   const scale = oldType.scale;
-  let unit = oldType.unit;
+  let unit = oldType.defaultUnit;
   for (let [candidateUnit, multiplier] of scale.entries()) {
     let candidate = newValue / parseFloat(multiplier);
     if (candidate.countDecimals() > 1 || candidate < 1) {
       break;
+    } else {
+      unit = candidateUnit;
+      newValue = candidate;
     }
-    unit = candidateUnit;
-    newValue = candidate;
   }
   return {
     ...oldEntry,
-    uid: oldEntry.uid,
-    productId: oldEntry.productId,
     unit,
     quantity: newValue,
   };

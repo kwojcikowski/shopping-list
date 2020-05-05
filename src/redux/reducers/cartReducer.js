@@ -19,14 +19,21 @@ export default function cartReducer(state = initialState.cart, action) {
       ];
     case types.UPDATE_PRODUCT_IN_CART_SUCCESS:
       return state.map((entry) =>
-        entry.uid === action.cartEntry.uid ? action.cartEntry : entry
+        entry.uid === parseInt(action.cartEntry.uid)
+          ? {
+              ...action.cartEntry,
+              uid: parseInt(action.cartEntry.uid),
+              productId: parseInt(action.cartEntry.productId, 10),
+              quantity: parseFloat(action.cartEntry.quantity),
+            }
+          : entry
       );
     case types.UPDATE_PRODUCT_IN_CART_LOCALLY_SUCCESS:
       return state.map((entry) =>
-          entry.uid === action.cartEntry.uid ? action.cartEntry : entry
+        entry.uid === parseInt(action.cartEntry.uid) ? action.cartEntry : entry
       );
     case types.DELETE_PRODUCT_FROM_CART_SUCCESS:
-      return state.filter(entry => entry.uid !== action.cartEntry.uid)
+      return state.filter((entry) => entry.uid !== action.cartEntry.uid);
     default:
       return state;
   }

@@ -16,14 +16,19 @@ const ManageStore = ({
   supportedStores,
   updateStoreOrder,
   addSectionToOrder,
+  deleteSectionFromOrder,
   sections,
 }) => {
   const [showLayout, setShowLayout] = useState(false);
 
   const onOrderSave = (newOrder) => {
-    updateStoreOrder({ order: newOrder, ...store }).then(
-      toast.success("Udało się zapisać kolejność!")
-    );
+    updateStoreOrder({
+      ...store,
+      order: newOrder.map((section, index) => ({
+        ...section,
+        sectionOrder: index,
+      })),
+    }).then(toast.success("Udało się zapisać kolejność!"));
   };
 
   const onSectionAdd = (section) => {
@@ -36,6 +41,16 @@ const ManageStore = ({
       });
   };
 
+  const onSectionDelete = (section) => {
+    deleteSectionFromOrder(store, section)
+      .then(() => {
+        toast.success(`Dział ${section.sectionName} usunięty z kolejki.`);
+      })
+      .catch(() => {
+        toast.error("Usunięcie działu nie powiodło się.");
+      });
+  };
+
   if (supportedStores.length === 0) return <Spinner />;
   return (
     <>
@@ -45,6 +60,7 @@ const ManageStore = ({
           order={sortBy(store.order, "sectionOrder")}
           onOrderSave={onOrderSave}
           onSectionAdd={onSectionAdd}
+          onSectionDelete={onSectionDelete}
           sections={sections}
         />
       </DndProvider>
@@ -63,6 +79,7 @@ ManageStore.propTypes = {
   updateStoreOrder: PropTypes.func.isRequired,
   sections: PropTypes.array.isRequired,
   addSectionToOrder: PropTypes.func.isRequired,
+  deleteSectionFromOrder: PropTypes.func.isRequired,
 };
 
 const findStoreBySlug = (slug, supportedStores) => {
@@ -85,6 +102,7 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = {
   updateStoreOrder: supportedStoresActions.updateStoreOrder,
   addSectionToOrder: supportedStoresActions.addSectionToOrder,
+  deleteSectionFromOrder: supportedStoresActions.deleteSectionFromOrder,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ManageStore);

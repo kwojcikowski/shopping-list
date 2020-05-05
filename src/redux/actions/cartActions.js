@@ -14,15 +14,15 @@ function updateProductInCartSuccess(cartEntry) {
 }
 
 function updateProductInCartLocallySuccess(cartEntry) {
-  return {type: types.UPDATE_PRODUCT_IN_CART_LOCALLY_SUCCESS, cartEntry};
+  return { type: types.UPDATE_PRODUCT_IN_CART_LOCALLY_SUCCESS, cartEntry };
 }
 
-function updateCartSuccess(cart){
-  return {type: types.UPDATE_CART_SUCCESS, cart}
+function updateCartSuccess(cart) {
+  return { type: types.UPDATE_CART_SUCCESS, cart };
 }
 
 function deleteProductFromCartSuccess(cartEntry) {
-  return {type: types.DELETE_PRODUCT_FROM_CART_SUCCESS, cartEntry}
+  return { type: types.DELETE_PRODUCT_FROM_CART_SUCCESS, cartEntry };
 }
 
 export function loadCart() {
@@ -60,7 +60,7 @@ export function updateProductInCart(cartEntry) {
     beginApiCall();
     return cartApi
       .updateProductInCart(cartEntry)
-      .then(() => {
+      .then((cartEntry) => {
         dispatch(updateProductInCartSuccess(cartEntry));
       })
       .catch((error) => {
@@ -71,32 +71,35 @@ export function updateProductInCart(cartEntry) {
 }
 
 export function updateProductInCartLocally(cartEntry) {
-  return function(dispatch) {
+  return function (dispatch) {
     return dispatch(updateProductInCartLocallySuccess(cartEntry));
-  }
+  };
 }
 
 export function updateCart(cart) {
-  return function(dispatch) {
+  return function (dispatch) {
     return cartApi
-        .updateCart(cart)
-        .then(() => {
-          dispatch(updateCartSuccess(cart))
-        })
-        .catch(error => {
-          dispatch(apiCallError(error));
-          throw error;
-        })
-  }
+      .updateCart(cart)
+      .then(() => {
+        dispatch(updateCartSuccess(cart));
+      })
+      .catch((error) => {
+        dispatch(apiCallError(error));
+        throw error;
+      });
+  };
 }
 
 export function deleteProductFromCart(cartEntry) {
-  return function(dispatch) {
-    return cartApi.deleteProductFromCart(cartEntry).then(() => {
-        dispatch(deleteProductFromCartSuccess(cartEntry))
-    }).catch(error => {
-              dispatch(apiCallError(error));
-              throw error;
-            })
-  }
+  return function (dispatch) {
+    return cartApi
+      .deleteProductFromCart(cartEntry)
+      .then(() => {
+        dispatch(deleteProductFromCartSuccess(cartEntry));
+      })
+      .catch((error) => {
+        dispatch(apiCallError(error));
+        throw error;
+      });
+  };
 }

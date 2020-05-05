@@ -10,9 +10,13 @@ export default function supportedStoresReducer(
       return action.supportedStores;
     case types.UPDATE_STORE_ORDER_SUCCESS:
       return state.map((store) =>
-        store.id === action.store.id ? action.store.id : store
+        store.id === action.store.id ? action.store : store
       );
     case types.ADD_SECTION_TO_ORDER_SUCCESS:
+      return state.map((store) =>
+        store.id === action.store.id ? action.store : store
+      );
+    case types.DELETE_SECTION_FROM_ORDER_SUCCESS:
       return state.map((store) =>
         store.id === action.store.id ? action.store : store
       );

@@ -14,6 +14,10 @@ function addSectionToOrderSuccess(store) {
   return { type: types.ADD_SECTION_TO_ORDER_SUCCESS, store };
 }
 
+function deleteSectionFromOrderSuccess(store) {
+  return { type: types.DELETE_SECTION_FROM_ORDER_SUCCESS, store };
+}
+
 export function loadSupportedStores() {
   return function (dispatch) {
     dispatch(beginApiCall());
@@ -51,6 +55,21 @@ export function updateStoreOrder(store) {
       .updateStoreOrder(store)
       .then((store) => {
         dispatch(updateStoreOrderSuccess(store));
+      })
+      .catch((error) => {
+        dispatch(apiCallError(error));
+        throw error;
+      });
+  };
+}
+
+export function deleteSectionFromOrder(store, section) {
+  return function (dispatch) {
+    dispatch(beginApiCall());
+    return supportedStoresApi
+      .deleteSectionFromOrder(store, section)
+      .then((store) => {
+        dispatch(deleteSectionFromOrderSuccess(store));
       })
       .catch((error) => {
         dispatch(apiCallError(error));

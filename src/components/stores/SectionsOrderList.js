@@ -19,10 +19,19 @@ const saveOrderButton = {
   margin: "15px",
 };
 
-const SectionsOrderList = ({ order, onOrderSave, onSectionAdd, sections }) => {
+const SectionsOrderList = ({
+  order,
+  onOrderSave,
+  onSectionAdd,
+  onSectionDelete,
+  sections,
+}) => {
   const [showAddPanel, setShowAddPanel] = useState(false);
   const [sectionsOrder, setSectionsOrder] = useState([...order]);
-  const [sectionToAdd, setSectionToAdd] = useState({});
+  const [sectionToAdd, setSectionToAdd] = useState({
+    ...sections[0],
+    sectionOrder: order.length,
+  });
 
   useEffect(() => {
     setSectionsOrder([...order]);
@@ -73,11 +82,7 @@ const SectionsOrderList = ({ order, onOrderSave, onSectionAdd, sections }) => {
               justifyContent: "center",
             }}
           >
-            <select
-              name={"section"}
-              value={sectionToAdd.id}
-              onChange={onSelectChange}
-            >
+            <select name={"section"} onChange={onSelectChange}>
               {sections.map((section) => {
                 return (
                   <option key={section.id} value={section.id}>
@@ -104,26 +109,31 @@ const SectionsOrderList = ({ order, onOrderSave, onSectionAdd, sections }) => {
           </button>
         )}
       </div>
-      <div className="sectionsOrderContaier" style={orderContainer}>
-        {sectionsOrder.map((section, index) => {
-          return (
-            <SectionCard
-              key={section.id}
-              index={index}
-              id={section.id}
-              text={section.sectionName}
-              moveCard={moveCard}
-            />
-          );
-        })}
-        <button
-          className="btn btn-primary"
-          style={saveOrderButton}
-          onClick={() => onOrderSave(sectionsOrder)}
-        >
-          Zapisz kolejność
-        </button>
-      </div>
+      {sectionsOrder.length === 0 ? (
+        <></>
+      ) : (
+        <div className="sectionsOrderContaier" style={orderContainer}>
+          {sectionsOrder.map((section, index) => {
+            return (
+              <SectionCard
+                key={section.id}
+                index={index}
+                id={section.id}
+                text={section.sectionName}
+                moveCard={moveCard}
+                onSectionDelete={() => onSectionDelete(section)}
+              />
+            );
+          })}
+          <button
+            className="btn btn-primary"
+            style={saveOrderButton}
+            onClick={() => onOrderSave(sectionsOrder)}
+          >
+            Zapisz kolejność
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -133,6 +143,7 @@ SectionsOrderList.propTypes = {
   onOrderSave: PropTypes.func.isRequired,
   sections: PropTypes.array.isRequired,
   onSectionAdd: PropTypes.func.isRequired,
+  onSectionDelete: PropTypes.func.isRequired,
 };
 
 export default SectionsOrderList;

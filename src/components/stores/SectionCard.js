@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
+import { FaTrashAlt } from "react-icons/fa";
 import PropTypes from "prop-types";
 import ItemTypes from "./ItemTypes";
 const style = {
@@ -11,9 +12,10 @@ const style = {
   cursor: "move",
   textAlign: "center",
   width: "400px",
+  position: "relative",
 };
 
-const SectionCard = ({ id, text, index, moveCard }) => {
+const SectionCard = ({ id, text, index, moveCard, onSectionDelete }) => {
   const ref = useRef(null);
   const [, drop] = useDrop({
     accept: ItemTypes.CARD,
@@ -67,6 +69,16 @@ const SectionCard = ({ id, text, index, moveCard }) => {
   return (
     <div ref={ref} style={{ ...style, opacity }}>
       {text}
+      <button
+        onClick={onSectionDelete}
+        style={{
+          position: "absolute",
+          right: "2rem",
+          color: "red",
+        }}
+      >
+        <FaTrashAlt />
+      </button>
     </div>
   );
 };
@@ -76,6 +88,7 @@ SectionCard.propTypes = {
   text: PropTypes.string.isRequired,
   index: PropTypes.number.isRequired,
   moveCard: PropTypes.func.isRequired,
+  onSectionDelete: PropTypes.func.isRequired,
 };
 
 export default SectionCard;

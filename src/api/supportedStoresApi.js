@@ -19,20 +19,22 @@ export function addSectionToOrder(section, store) {
 }
 
 export function updateStoreOrder(store) {
-  const orderString = JSON.stringify(
-    store.order.map((entry) => {
-      return {
-        id: entry.id,
-        sectionId: entry.sectionId,
-        sectionOrder: entry.sectionOrder,
-      };
-    })
-  );
-  const url = baseUrl + `/updateOrder?store=${store.tableReference}`;
+  const url = baseUrl + `/updateOrder`;
   return fetch(url, {
     method: "POST", // POST for create, PUT to update when id already exists.
     headers: { "content-type": "application/json" },
-    body: orderString,
+    body: JSON.stringify(store),
+  })
+    .then(handleResponse)
+    .catch(handleError);
+}
+
+export function deleteSectionFromOrder(store, section) {
+  const url = baseUrl + `/deleteSection`;
+  return fetch(url, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ store, section }),
   })
     .then(handleResponse)
     .catch(handleError);
