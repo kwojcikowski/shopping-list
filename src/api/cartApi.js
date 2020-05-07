@@ -7,10 +7,11 @@ export function getCart() {
 }
 
 export function addProductToCart(cartEntry) {
-  const { productId, unit, quantity } = cartEntry;
-  return fetch(
-    baseUrl + `/add?productId=${productId}&unit=${unit}&quantity=${quantity}`
-  )
+  return fetch(baseUrl + `/add`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(cartEntry),
+  })
     .then(handleResponse)
     .catch(handleError);
 }
@@ -26,24 +27,21 @@ export function updateProductInCart(cartEntry) {
 }
 
 export function updateCart(cart) {
-  let cartString = JSON.stringify(
-    cart.map((entry) => {
-      return {
-        uid: entry.uid,
-        productId: entry.productId,
-        unit: entry.unit,
-        quantity: entry.quantity,
-      };
-    })
-  );
-  return fetch(baseUrl + `/update?cart=${cartString.toString()}`)
+  return fetch(baseUrl + `/update`, {
+    method: "PUT", // POST for create, PUT to update when id already exists.
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(cart),
+  })
     .then(handleResponse)
     .catch(handleError);
 }
 
 export function deleteProductFromCart(cartEntry) {
-  const { uid } = cartEntry;
-  return fetch(baseUrl + `/deleteProduct?uid=${uid}`)
+  return fetch(baseUrl + `/deleteProduct`, {
+    method: "PUT", // POST for create, PUT to update when id already exists.
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(cartEntry),
+  })
     .then(handleResponse)
     .catch(handleError);
 }

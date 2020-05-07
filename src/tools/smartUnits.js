@@ -58,10 +58,11 @@ export const evaluateBestUnit = (oldEntry, newEntry = {}) => {
     const newType = normalizeEntryUnit(newEntry);
     newValue += newType.value;
   }
+  const startValue = newValue;
   const scale = oldType.scale;
   let unit = oldType.defaultUnit;
   for (let [candidateUnit, multiplier] of scale.entries()) {
-    let candidate = newValue / parseFloat(multiplier);
+    let candidate = startValue / multiplier;
     if (candidate.countDecimals() > 1 || candidate < 1) {
       break;
     } else {

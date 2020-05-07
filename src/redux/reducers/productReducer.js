@@ -14,6 +14,8 @@ export default function productsReducer(state = initialState.products, action) {
           name: action.product.name.replace("_", " "),
         },
       ];
+    case types.DELETE_PRODUCT_SUCCESS:
+      return state.filter((product) => product.id !== action.product.id);
     default:
       return state;
   }

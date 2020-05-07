@@ -5,14 +5,21 @@ import * as productActions from "../../redux/actions/productActions";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
+import * as smartUnits from "../../tools/smartUnits";
 
-const Header = ({ sections, products, saveProduct }) => {
+const Header = ({ sections, saveProduct }) => {
+  const defaultProduct = {
+    name: "",
+    default_unit: "",
+    section: 0,
+  };
   const [expand, setExpand] = useState(false);
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState({ ...defaultProduct });
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
 
   const activeStyle = { color: "#F15B2A" };
+  const units = smartUnits.getAvailableUnits();
 
   const handleOnChange = (event) => {
     const { name, value } = event.target;
@@ -41,12 +48,12 @@ const Header = ({ sections, products, saveProduct }) => {
     setSaving(true);
     saveProduct(product)
       .then(() => {
-        toast.success(`Pomyślnie dodano produkt '${product.name}'.`);
+        toast.success(`Pomyślnie dodano produkt ${product.name}.`);
         setSaving(false);
-        setProduct({});
+        setProduct((prevProduct) => ({ ...prevProduct, ...defaultProduct }));
       })
-      .catch((error) => {
-        toast.error("Błąd przy dodawaniu produktu: " + error);
+      .catch(() => {
+        toast.error("Błąd przy dodawaniu produktu");
         setSaving(false);
       });
   };
@@ -79,7 +86,8 @@ const Header = ({ sections, products, saveProduct }) => {
       </button>
       {expand ? (
         <AddProductForm
-          products={products}
+          product={product}
+          units={units}
           sections={sections}
           onSave={handleOnSave}
           onChange={handleOnChange}
@@ -94,14 +102,12 @@ const Header = ({ sections, products, saveProduct }) => {
 };
 
 Header.propTypes = {
-  products: PropTypes.array.isRequired,
   sections: PropTypes.array.isRequired,
   saveProduct: PropTypes.func.isRequired,
 };
 
 function mapStateToProps(state) {
   return {
-    products: state.products,
     sections: state.sections,
   };
 }

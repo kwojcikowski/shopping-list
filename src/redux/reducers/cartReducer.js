@@ -3,6 +3,9 @@ import initialState from "./initialState";
 
 export default function cartReducer(state = initialState.cart, action) {
   switch (action.type) {
+    // ! WARNING ! IN CASE OF DELETING A PRODUCT FROM DATABASE ALSO DELTE FROM CART.
+    case types.DELETE_PRODUCT_SUCCESS:
+      return state.filter((entry) => entry.productId !== action.product.id);
     case types.LOAD_CART_SUCCESS:
       return action.cart;
     case types.UPDATE_CART_SUCCESS:

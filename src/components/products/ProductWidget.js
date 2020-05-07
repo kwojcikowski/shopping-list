@@ -4,6 +4,7 @@ import SelectInput from "../common/SelectInput";
 import TextInput from "../common/TextInput";
 import { connect } from "react-redux";
 import * as cartActions from "../../redux/actions/cartActions";
+import * as productActions from "../../redux/actions/productActions";
 import { toast } from "react-toastify";
 import * as smartUnits from "../../tools/smartUnits";
 
@@ -14,8 +15,9 @@ const ProductWidget = ({
   apiCallsInProgress,
   addProductToCart,
   updateProductInCart,
+  deleteProduct,
 }) => {
-  const units = ["szt", "g", "kg", "ml", "l"];
+  const units = smartUnits.getAvailableUnits();
   const bgColor = index % 2 === 0 ? { backgroundColor: "#EEEEEE" } : {};
 
   const [cartEntry, setCartEntry] = useState({
@@ -32,16 +34,16 @@ const ProductWidget = ({
         .then(() => {
           toast.success(`Produkt ${product.name} dodany do koszyka!`);
         })
-        .catch((err) => {
-          toast.error("Wystąpił błąd: " + err);
+        .catch(() => {
+          toast.error(`Wystąpił błąd przy dodawaniu do koszyka.`);
         });
     } else if (!apiCallsInProgress) {
       addProductToCart(cartEntry)
         .then(() => {
           toast.success(`Produkt ${product.name} dodany do koszyka!`);
         })
-        .catch((err) => {
-          toast.error("Wystąpił błąd: " + err);
+        .catch(() => {
+          toast.error(`Wystąpił błąd przy dodawaniu do koszyka.`);
         });
     } else {
       toast.info("Wystąpił chwilowy problem. Spróbuj za chwilę.");
@@ -54,6 +56,16 @@ const ProductWidget = ({
       ...prevEntry,
       [name]: value,
     }));
+  };
+
+  const onProductDelete = () => {
+    deleteProduct(product)
+      .then(() => {
+        toast.success(`Produkt ${product.name} pomyślnie usunięty.`);
+      })
+      .catch(() => {
+        toast.error(`Usuwanie produktu ${product.name} nie powiodło się.`);
+      });
   };
 
   return (
@@ -89,6 +101,14 @@ const ProductWidget = ({
           Dodaj do koszyka
         </button>
       </td>
+      <td>
+        <button
+          className="btn btn-sm btn-outline-danger"
+          onClick={onProductDelete}
+        >
+          Usuń produkt
+        </button>
+      </td>
     </tr>
   );
 };
@@ -100,6 +120,7 @@ ProductWidget.propTypes = {
   addProductToCart: PropTypes.func.isRequired,
   updateProductInCart: PropTypes.func.isRequired,
   apiCallsInProgress: PropTypes.bool.isRequired,
+  deleteProduct: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -112,6 +133,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
   addProductToCart: cartActions.addProductToCart,
   updateProductInCart: cartActions.updateProductInCart,
+  deleteProduct: productActions.deleteProduct,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductWidget);

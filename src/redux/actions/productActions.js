@@ -10,6 +10,10 @@ function saveProductSuccess(product) {
   return { type: types.SAVE_PRODUCT_SUCCESS, product };
 }
 
+function deleteProductSuccess(product) {
+  return { type: types.DELETE_PRODUCT_SUCCESS, product };
+}
+
 export function loadProducts() {
   return function (dispatch) {
     dispatch(beginApiCall());
@@ -35,6 +39,21 @@ export function saveProduct(product) {
       })
       .catch((error) => {
         dispatch(apiCallError(error));
+        throw error;
+      });
+  };
+}
+
+export function deleteProduct(product) {
+  return function (dispatch) {
+    dispatch(beginApiCall());
+    return productApi
+      .deleteProduct(product)
+      .then((product) => {
+        dispatch(deleteProductSuccess(product));
+      })
+      .catch((error) => {
+        apiCallError(error);
         throw error;
       });
   };

@@ -48,7 +48,7 @@ const ShoppingListPage = ({
     name: "",
     default_unit: "",
     unit: "",
-    quantity: 0,
+    quantity: "0",
     section: -1,
   });
 
@@ -88,22 +88,38 @@ const ShoppingListPage = ({
     setNewCartProduct({
       ...newCartProduct,
       ...selectedOption,
-      unit: selectedOption.default_unit,
+      unit: newCartProduct.unit
+        ? newCartProduct.unit
+        : selectedOption.default_unit,
     });
   };
 
   const onNewProductUnitChange = (selectedOption) => {
-    setNewCartProduct({
-      ...newCartProduct,
-      ...selectedOption,
-    });
+    const product = { ...newCartProduct, ...selectedOption };
+    if (product.quantity !== 0 && product.unit !== "") {
+      setNewCartProduct((prev) => ({
+        ...prev,
+        ...evaluateBestUnit(product),
+      }));
+    } else {
+      setNewCartProduct({
+        ...newCartProduct,
+        ...selectedOption,
+      });
+    }
   };
 
   const onNewProductQuantityChange = (event) => {
-    setNewCartProduct({
-      ...newCartProduct,
-      quantity: parseInt(event.target.value),
-    });
+    // eslint-disable-next-line no-useless-escape
+    if (
+      event.target.value.match("^[0-9]+[.,]?[0-9]*$") ||
+      event.target.value === ""
+    ) {
+      setNewCartProduct({
+        ...newCartProduct,
+        quantity: event.target.value,
+      });
+    }
   };
 
   const onNewProductSubmit = (event) => {
@@ -162,10 +178,30 @@ const ShoppingListPage = ({
   };
 
   const onFocusOut = () => {
-    if (newCartProduct.id === -1 || newCartProduct.unit === "") return;
-    const newProduct = evaluateBestUnit(newCartProduct);
-    if (JSON.stringify(newProduct) !== JSON.stringify(newCartProduct)) {
-      setNewCartProduct((prevValue) => ({ ...prevValue, ...newProduct }));
+    let quantity = newCartProduct.quantity.toString();
+    if (quantity === "") {
+      setNewCartProduct((prevValue) => ({ ...prevValue, quantity: 0 }));
+      return;
+    }
+    // eslint-disable-next-line no-useless-escape
+    if (quantity.match("/^[0-9]+[.,]$/")) {
+      quantity = quantity.replace("[,.]", "");
+    }
+    quantity = parseFloat(quantity.replace(",", "."));
+    if (newCartProduct.unit === "") {
+      setNewCartProduct((prevValue) => ({ ...prevValue, quantity }));
+    } else {
+      const newProduct = evaluateBestUnit({
+        ...newCartProduct,
+        quantity,
+      });
+      if (JSON.stringify(newProduct) !== JSON.stringify(newCartProduct)) {
+        setNewCartProduct((prevValue) => ({
+          ...prevValue,
+          ...newProduct,
+          quantity: newProduct.quantity.toString(),
+        }));
+      }
     }
   };
 
@@ -217,12 +253,13 @@ const ShoppingListPage = ({
               getOptionValue={(option) => `${option.id}`}
               options={products}
             />
-            <InlineTextInput
-              style={{ margin: "10px" }}
+            <input
+              style={{ margin: "10px", width: "50px" }}
               onChange={onNewProductQuantityChange}
               name={"quantity"}
               value={newCartProduct.quantity}
-              onFocusOut={onFocusOut}
+              type="text"
+              onBlur={onFocusOut}
             />
             <Select
               name="unit"

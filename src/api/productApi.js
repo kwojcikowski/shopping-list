@@ -7,14 +7,21 @@ export function getProducts() {
 }
 
 export function saveProduct(product) {
-  const { name, default_unit, section } = product;
-  return fetch(
-    baseUrl +
-      `/add?name=${name.replace(
-        " ",
-        "_"
-      )}&default_unit=${default_unit}&section=${section}`
-  )
+  return fetch(baseUrl + "/add", {
+    method: "POST", // POST for create, PUT to update when id already exists.
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(product),
+  })
+    .then(handleResponse)
+    .catch(handleError);
+}
+
+export function deleteProduct(product) {
+  return fetch(baseUrl + "/delete", {
+    method: "PUT", // POST for create, PUT to update when id already exists.
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(product),
+  })
     .then(handleResponse)
     .catch(handleError);
 }
