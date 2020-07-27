@@ -1,6 +1,5 @@
 import React from "react";
 import TextInput from "./TextInput";
-import SelectInput from "./SelectInput";
 import PropTypes from "prop-types";
 
 const AddProductForm = ({

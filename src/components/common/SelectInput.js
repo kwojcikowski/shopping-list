@@ -5,7 +5,7 @@ const SelectInput = ({
   name,
   label,
   onChange,
-  defaultOption,
+  // defaultOption,
   value,
   error,
   options,

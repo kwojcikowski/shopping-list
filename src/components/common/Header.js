@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import * as smartUnits from "../../tools/smartUnits";
+import { FaUser } from "react-icons/fa";
 
 const Header = ({ sections, saveProduct }) => {
   const defaultProduct = {
@@ -13,7 +14,7 @@ const Header = ({ sections, saveProduct }) => {
     default_unit: "",
     section: 0,
   };
-  const [expand, setExpand] = useState(false);
+  const [expand /*, setExpand*/] = useState(false);
   const [product, setProduct] = useState({ ...defaultProduct });
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -60,30 +61,38 @@ const Header = ({ sections, saveProduct }) => {
 
   return (
     <>
-      <nav style={{ display: "inline-block" }}>
-        <NavLink to="/" activeStyle={activeStyle} exact>
-          Lista zakupów
-        </NavLink>
-        {" | "}
-        <NavLink to={"/products"} activeStyle={activeStyle}>
-          Produkty
-        </NavLink>
-        {" | "}
-        <NavLink to="/recipes" activeStyle={activeStyle}>
-          Przepisy
-        </NavLink>
-        {" | "}
-        <NavLink to="/stores" activeStyle={activeStyle}>
-          Sklepy
-        </NavLink>
-      </nav>
-      <button
-        className="btn btn-outline-info"
-        style={{ marginLeft: "30px" }}
-        onClick={() => setExpand(!expand)}
-      >
-        Dodaj produkt
-      </button>
+      <div style={{ display: "inline-block", width: "100%" }}>
+        <nav>
+          <NavLink to="/" activeStyle={activeStyle} exact>
+            Lista zakupów
+          </NavLink>
+          {" | "}
+          <NavLink to={"/products"} activeStyle={activeStyle}>
+            Produkty
+          </NavLink>
+          {" | "}
+          <NavLink to="/recipes" activeStyle={activeStyle}>
+            Przepisy
+          </NavLink>
+          {" | "}
+          <NavLink to="/stores" activeStyle={activeStyle}>
+            Sklepy
+          </NavLink>
+          <NavLink to="/profile" activeStyle={activeStyle}>
+            <p style={{ float: "right" }}>
+              Zaloguj się
+              <FaUser />
+            </p>
+          </NavLink>
+        </nav>
+      </div>
+      {/*<button*/}
+      {/*  className="btn btn-outline-info"*/}
+      {/*  style={{ marginLeft: "30px" }}*/}
+      {/*  onClick={() => setExpand(!expand)}*/}
+      {/*>*/}
+      {/*  Dodaj produkt*/}
+      {/*</button>*/}
       {expand ? (
         <AddProductForm
           product={product}
@@ -103,12 +112,14 @@ const Header = ({ sections, saveProduct }) => {
 
 Header.propTypes = {
   sections: PropTypes.array.isRequired,
+  auth: PropTypes.object.isRequired,
   saveProduct: PropTypes.func.isRequired,
 };
 
 function mapStateToProps(state) {
   return {
     sections: state.sections,
+    auth: state.auth,
   };
 }
 

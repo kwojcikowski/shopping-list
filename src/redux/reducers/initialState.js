@@ -4,4 +4,5 @@ export default {
   cart: [],
   supportedStores: [],
   apiCallsInProgress: 0,
+  auth: {},
 };

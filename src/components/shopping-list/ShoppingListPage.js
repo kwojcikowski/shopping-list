@@ -12,7 +12,6 @@ import {
   evaluateBestUnit,
   getAvailableUnits,
 } from "../../tools/smartUnits";
-import InlineTextInput from "../common/InlineTextInput";
 import { toast } from "react-toastify";
 
 const selectStyleName = {
