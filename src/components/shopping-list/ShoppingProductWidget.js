@@ -8,18 +8,20 @@ import PropTypes from "prop-types";
 import { FaTrashAlt } from "react-icons/fa";
 
 const ShoppingProductWidget = ({
-  product,
+  cartItem,
   updateProductInCart,
   deleteProductFromCart,
 }) => {
-  const [cartProduct, setCartProduct] = useState({ ...product });
+  const [cartProduct, setCartProduct] = useState(evaluateBestUnit(cartItem));
 
   useEffect(() => {
-    setCartProduct((prevProduct) => ({
-      ...prevProduct,
-      ...product,
-    }));
-  }, [product]);
+    setCartProduct((prevProduct) =>
+      evaluateBestUnit({
+        ...prevProduct,
+        ...cartItem,
+      })
+    );
+  }, [cartItem]);
 
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
@@ -31,7 +33,7 @@ const ShoppingProductWidget = ({
   };
 
   const onFocusOut = () => {
-    if (JSON.stringify(cartProduct) !== JSON.stringify(product)) {
+    if (JSON.stringify(cartProduct) !== JSON.stringify(cartItem)) {
       const newProduct = evaluateBestUnit(cartProduct);
       setCartProduct(evaluateBestUnit(newProduct));
       updateProductInCart(newProduct);
@@ -39,8 +41,8 @@ const ShoppingProductWidget = ({
   };
 
   return (
-    <tr key={product.uid} className={"listRow"}>
-      <td className={"listColumn"}>{cartProduct.productName}</td>
+    <tr key={cartProduct.product._links.self.href} className={"listRow"}>
+      <td className={"listColumn"}>{cartProduct.product.name}</td>
       <td>
         <InlineTextInput
           onChange={onChangeHandler}
@@ -61,7 +63,7 @@ const ShoppingProductWidget = ({
       </td>
       <td>
         <button
-          onClick={() => deleteProductFromCart(cartProduct)}
+          onClick={() => deleteProductFromCart(cartItem._links.self.href)}
           className="btn btn-outline-danger"
         >
           <FaTrashAlt />
@@ -72,7 +74,7 @@ const ShoppingProductWidget = ({
 };
 
 ShoppingProductWidget.propTypes = {
-  product: PropTypes.object.isRequired,
+  cartItem: PropTypes.object.isRequired,
   updateProductInCart: PropTypes.func.isRequired,
   deleteProductFromCart: PropTypes.func.isRequired,
 };

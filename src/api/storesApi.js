@@ -1,7 +1,7 @@
 import { handleError, handleResponse } from "./apiUtils";
-const baseUrl = "http://localhost:4000/supported-stores";
+const baseUrl = "http://localhost:8080/stores";
 
-export function loadSupportedStores() {
+export function loadStores() {
   return fetch(baseUrl).then(handleResponse).catch(handleError);
 }
 

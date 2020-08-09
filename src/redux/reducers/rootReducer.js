@@ -3,14 +3,16 @@ import products from "./productReducer";
 import apiCallsInProgress from "./apiStatusReducer";
 import sections from "./sectionsReducer";
 import cart from "./cartReducer";
-import supportedStores from "./supportedStoresReducer";
+import stores from "./storesReducer";
+import storeSections from "./storeSectionsReducer";
 
 const rootReducer = combineReducers({
   products,
   sections,
   apiCallsInProgress,
   cart,
-  supportedStores,
+  stores,
+  storeSections,
 });
 
 export default rootReducer;

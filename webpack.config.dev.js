@@ -28,6 +28,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: "src/index.html",
+      favicon: "resources/favicon.png",
     }),
   ],
   module: {
@@ -45,9 +46,9 @@ module.exports = {
         test: /\.(png|jp(e*)g|svg|gif)$/,
         use: [
           {
-            loader: 'file-loader',
+            loader: "file-loader",
             options: {
-              name: 'images/[hash]-[name].[ext]',
+              name: "images/[hash]-[name].[ext]",
             },
           },
         ],

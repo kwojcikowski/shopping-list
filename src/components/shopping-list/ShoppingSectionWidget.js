@@ -3,31 +3,47 @@ import "./ShoppingListPageStyle.css";
 import PropTypes from "prop-types";
 import ShoppingProductWidget from "./ShoppingProductWidget";
 import * as cartActions from "../../redux/actions/cartActions";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
+import { mapToUnit } from "../../tools/smartUnits";
+import { toast } from "react-toastify";
 
-const ShoppingSectionWidget = ({ editable, section, products, deleteProductFromCart }) => {
-
-    const onProductDelete = (cartProduct) => {
-        deleteProductFromCart(cartProduct)
-    }
+const ShoppingSectionWidget = ({
+  editable,
+  section,
+  cartItems,
+  deleteProductFromCart,
+}) => {
+  const onProductDelete = (cartProduct) => {
+    deleteProductFromCart(cartProduct)
+      .then(() => {
+        toast.success(`Produkt pomyślnie usunięty z listy.`);
+      })
+      .catch(() => {
+        toast.error("Wystąpił błąd przy usuwaniu produktu z listy.");
+      });
+  };
 
   return (
     <>
       <h4 className={"sectionTitle"}>{section}</h4>
       <table className={"listTable"}>
         <tbody>
-          {products.map((product) => {
+          {cartItems.map((cartItem) => {
             if (editable) {
               return (
-                <ShoppingProductWidget deleteProductFromCart={onProductDelete} key={product.uid} product={product} />
+                <ShoppingProductWidget
+                  deleteProductFromCart={onProductDelete}
+                  key={cartItem._links.self.href}
+                  cartItem={cartItem}
+                />
               );
             } else {
               return (
-                <tr key={product.uid} className={"listRow"}>
-                  <td className={"listColumn"}>{product.productName}</td>
+                <tr key={cartItem._links.self.href} className={"listRow"}>
+                  <td className={"listColumn"}>{cartItem.product.name}</td>
                   <td className={"listColumn"}>
-                    {product.quantity + " "}
-                    {product.unit}
+                    {cartItem.quantity + " "}
+                    {mapToUnit(cartItem.unit)}
                   </td>
                 </tr>
               );
@@ -41,17 +57,20 @@ const ShoppingSectionWidget = ({ editable, section, products, deleteProductFromC
 
 ShoppingSectionWidget.propTypes = {
   section: PropTypes.string.isRequired,
-  products: PropTypes.array.isRequired,
+  cartItems: PropTypes.array.isRequired,
   editable: PropTypes.bool.isRequired,
-    deleteProductFromCart: PropTypes.func.isRequired
+  deleteProductFromCart: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = () => {
-    return {}
-}
+  return {};
+};
 
 const mapDispatchToProps = {
-    deleteProductFromCart: cartActions.deleteProductFromCart
-}
+  deleteProductFromCart: cartActions.deleteProductFromCart,
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(ShoppingSectionWidget);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ShoppingSectionWidget);

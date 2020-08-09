@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import StoreImage from "../../../resources/Lidl_sredzka.svg";
-import * as supportedStoresActions from "../../redux/actions/supportedStoresActions";
+import * as supportedStoresActions from "../../redux/actions/storesActions";
 import { FaAngleRight, FaAngleDown } from "react-icons/fa";
 import { connect } from "react-redux";
 import SectionsOrderList from "./SectionsOrderList";

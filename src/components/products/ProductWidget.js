@@ -13,7 +13,7 @@ const ProductWidget = ({
   product,
   index,
   apiCallsInProgress,
-  addProductToCart,
+  // addProductToCartAndFetch,
   updateProductInCart,
   deleteProduct,
 }) => {
@@ -38,13 +38,13 @@ const ProductWidget = ({
           toast.error(`Wystąpił błąd przy dodawaniu do koszyka.`);
         });
     } else if (!apiCallsInProgress) {
-      addProductToCart(cartEntry)
-        .then(() => {
-          toast.success(`Produkt ${product.name} dodany do koszyka!`);
-        })
-        .catch(() => {
-          toast.error(`Wystąpił błąd przy dodawaniu do koszyka.`);
-        });
+      // addProductToCart(cartEntry)
+      //   .then(() => {
+      //     toast.success(`Produkt ${product.name} dodany do koszyka!`);
+      //   })
+      //   .catch(() => {
+      //     toast.error(`Wystąpił błąd przy dodawaniu do koszyka.`);
+      //   });
     } else {
       toast.info("Wystąpił chwilowy problem. Spróbuj za chwilę.");
     }
@@ -117,7 +117,7 @@ ProductWidget.propTypes = {
   product: PropTypes.object.isRequired,
   index: PropTypes.number.isRequired,
   cart: PropTypes.array.isRequired,
-  addProductToCart: PropTypes.func.isRequired,
+  // addProductToCart: PropTypes.func.isRequired,
   updateProductInCart: PropTypes.func.isRequired,
   apiCallsInProgress: PropTypes.bool.isRequired,
   deleteProduct: PropTypes.func.isRequired,
@@ -131,7 +131,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-  addProductToCart: cartActions.addProductToCart,
+  addProductToCartAndFetch: cartActions.addProductToCartAndFetch,
   updateProductInCart: cartActions.updateProductInCart,
   deleteProduct: productActions.deleteProduct,
 };

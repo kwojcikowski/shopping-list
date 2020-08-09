@@ -1,9 +1,9 @@
 import * as types from "./actionTypes";
-import * as supportedStoresApi from "../../api/supportedStoresApi";
+import * as storesApi from "../../api/storesApi";
 import { apiCallError, beginApiCall } from "./apiStatusActions";
 
 function loadSupportedStoresSuccess(supportedStores) {
-  return { type: types.LOAD_SUPPORTED_STORES_SUCCESS, supportedStores };
+  return { type: types.LOAD_STORES_SUCCESS, supportedStores };
 }
 
 function updateStoreOrderSuccess(store) {
@@ -18,11 +18,11 @@ function deleteSectionFromOrderSuccess(store) {
   return { type: types.DELETE_SECTION_FROM_ORDER_SUCCESS, store };
 }
 
-export function loadSupportedStores() {
+export function loadStores() {
   return function (dispatch) {
     dispatch(beginApiCall());
-    return supportedStoresApi
-      .loadSupportedStores()
+    return storesApi
+      .loadStores()
       .then((supportedStores) => {
         dispatch(loadSupportedStoresSuccess(supportedStores));
       })
@@ -36,7 +36,7 @@ export function loadSupportedStores() {
 export function addSectionToOrder(section, store) {
   return function (dispatch) {
     dispatch(beginApiCall());
-    return supportedStoresApi
+    return storesApi
       .addSectionToOrder(section, store)
       .then((response) => {
         dispatch(addSectionToOrderSuccess(response));
@@ -51,7 +51,7 @@ export function addSectionToOrder(section, store) {
 export function updateStoreOrder(store) {
   return function (dispatch) {
     dispatch(beginApiCall());
-    return supportedStoresApi
+    return storesApi
       .updateStoreOrder(store)
       .then((store) => {
         dispatch(updateStoreOrderSuccess(store));
@@ -66,7 +66,7 @@ export function updateStoreOrder(store) {
 export function deleteSectionFromOrder(store, section) {
   return function (dispatch) {
     dispatch(beginApiCall());
-    return supportedStoresApi
+    return storesApi
       .deleteSectionFromOrder(store, section)
       .then((store) => {
         dispatch(deleteSectionFromOrderSuccess(store));
