@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import StoreImage from "../../../resources/Lidl_sredzka.svg";
-import * as supportedStoresActions from "../../redux/actions/supportedStoresActions";
+import * as storeActions from "../../redux/actions/storeActions";
+import * as storeSectionsActions from "../../redux/actions/storeSectionsActions";
 import { FaAngleRight, FaAngleDown } from "react-icons/fa";
 import { connect } from "react-redux";
 import SectionsOrderList from "./SectionsOrderList";
@@ -9,100 +10,108 @@ import Spinner from "../common/Spinner";
 import { DndProvider } from "react-dnd";
 import Backend from "react-dnd-html5-backend";
 import { toast } from "react-toastify";
-import { sortBy } from "underscore";
+import { sortBy, isEmpty } from "underscore";
 
 const ManageStore = ({
+  apiCallsInProgress,
   store,
-  supportedStores,
-  updateStoreOrder,
-  addSectionToOrder,
-  deleteSectionFromOrder,
-  sections,
+  storeSectionsItems,
+  slug,
+  loadStoreByUrlFriendlyName,
+  loadStoreSectionsByStoreUrlFriendlyName,
 }) => {
   const [showLayout, setShowLayout] = useState(false);
 
-  const onOrderSave = (newOrder) => {
-    updateStoreOrder({
-      ...store,
-      order: newOrder.map((section, index) => ({
-        ...section,
-        sectionOrder: index,
-      })),
-    }).then(toast.success("Udało się zapisać kolejność!"));
-  };
+  useEffect(() => {
+    loadStoreByUrlFriendlyName(slug);
+    loadStoreSectionsByStoreUrlFriendlyName(slug);
+  }, []);
 
-  const onSectionAdd = (section) => {
-    addSectionToOrder(section, store)
-      .then(() => {
-        toast.success(`Dział ${section.name} dodany.`);
-      })
-      .catch(() => {
-        toast.error("Dodawanie działu nie powiodło się.");
-      });
-  };
+  // const onOrderSave = (newOrder) => {
+  //   updateStoreOrder({
+  //     ...store,
+  //     order: newOrder.map((section, index) => ({
+  //       ...section,
+  //       sectionOrder: index,
+  //     })),
+  //   }).then(toast.success("Udało się zapisać kolejność!"));
+  // };
+  //
+  // const onSectionAdd = (section) => {
+  //   addSectionToOrder(section, store)
+  //     .then(() => {
+  //       toast.success(`Dział ${section.name} dodany.`);
+  //     })
+  //     .catch(() => {
+  //       toast.error("Dodawanie działu nie powiodło się.");
+  //     });
+  // };
+  //
+  // const onSectionDelete = (section) => {
+  //   deleteSectionFromOrder(store, section)
+  //     .then(() => {
+  //       toast.success(`Dział ${section.sectionName} usunięty z kolejki.`);
+  //     })
+  //     .catch(() => {
+  //       toast.error("Usunięcie działu nie powiodło się.");
+  //     });
+  // };
 
-  const onSectionDelete = (section) => {
-    deleteSectionFromOrder(store, section)
-      .then(() => {
-        toast.success(`Dział ${section.sectionName} usunięty z kolejki.`);
-      })
-      .catch(() => {
-        toast.error("Usunięcie działu nie powiodło się.");
-      });
-  };
-
-  if (supportedStores.length === 0) return <Spinner />;
   return (
     <>
-      <h2>{store.fullName}</h2>
-      <DndProvider backend={Backend}>
-        <SectionsOrderList
-          order={sortBy(store.order, "sectionOrder")}
-          onOrderSave={onOrderSave}
-          onSectionAdd={onSectionAdd}
-          onSectionDelete={onSectionDelete}
-          sections={sections}
-        />
-      </DndProvider>
-      <button onClick={() => setShowLayout(!showLayout)}>
-        {showLayout ? "Schowaj mapkę " : "Pokaż mapkę sklepu "}
-        {showLayout ? <FaAngleDown /> : <FaAngleRight />}
-      </button>
-      {showLayout ? <img src={StoreImage} alt={store.fullName} /> : <></>}
+      {apiCallsInProgress ? (
+        <Spinner />
+      ) : (
+        <>
+          <h2>{store.name}</h2>
+          {storeSectionsItems.map((storeSectionsItem) => (
+            <div key={storeSectionsItem._links.self.href}>
+              {storeSectionsItem.section.name}
+            </div>
+          ))}
+          {/*<DndProvider backend={Backend}>*/}
+          {/*  <SectionsOrderList*/}
+          {/*    order={sortBy(store.order, "sectionOrder")}*/}
+          {/*    onOrderSave={onOrderSave}*/}
+          {/*    onSectionAdd={onSectionAdd}*/}
+          {/*    onSectionDelete={onSectionDelete}*/}
+          {/*    sections={sections}*/}
+          {/*  />*/}
+          {/*</DndProvider>*/}
+          <button onClick={() => setShowLayout(!showLayout)}>
+            {showLayout ? "Schowaj mapkę " : "Pokaż mapkę sklepu "}
+            {showLayout ? <FaAngleDown /> : <FaAngleRight />}
+          </button>
+          {showLayout ? <img src={StoreImage} alt={store.fullName} /> : <></>}
+        </>
+      )}
     </>
   );
 };
 
 ManageStore.propTypes = {
+  slug: PropTypes.string.isRequired,
   store: PropTypes.object.isRequired,
-  supportedStores: PropTypes.array.isRequired,
-  updateStoreOrder: PropTypes.func.isRequired,
-  sections: PropTypes.array.isRequired,
-  addSectionToOrder: PropTypes.func.isRequired,
-  deleteSectionFromOrder: PropTypes.func.isRequired,
-};
-
-const findStoreBySlug = (slug, supportedStores) => {
-  return supportedStores.find((store) => store.tableReference === slug) || null;
+  storeSectionsItems: PropTypes.array.isRequired,
+  loadStoreByUrlFriendlyName: PropTypes.func.isRequired,
+  loadStoreSectionsByStoreUrlFriendlyName: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {
-  const slug = ownProps.match.params.slug;
-  const store =
-    slug && state.supportedStores.length > 0
-      ? findStoreBySlug(slug, state.supportedStores)
-      : { tableReference: "", fullName: "" };
   return {
-    store,
-    supportedStores: state.supportedStores,
-    sections: state.sections,
+    apiCallsInProgress: state.apiCallsInProgress > 0,
+    slug: ownProps.match.params.slug,
+    store: state.store,
+    storeSectionsItems: isEmpty(state.storeSections)
+      ? []
+      : state.storeSections._embedded.storeSections,
   };
 };
 
 const mapDispatchToProps = {
-  updateStoreOrder: supportedStoresActions.updateStoreOrder,
-  addSectionToOrder: supportedStoresActions.addSectionToOrder,
-  deleteSectionFromOrder: supportedStoresActions.deleteSectionFromOrder,
+  loadStoreByUrlFriendlyName: storeActions.loadStoreByUrlFriendlyName,
+  loadStoreSectionsByStoreUrlFriendlyName:
+    storeSectionsActions.loadStoreSectionsByStoreUrlFriendlyName,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ManageStore);

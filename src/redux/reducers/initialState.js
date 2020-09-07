@@ -1,8 +1,11 @@
 export default {
-  products: [],
-  sections: [],
-  cart: [],
-  supportedStores: [],
+  products: {},
+  sections: {},
+  cart: {},
+  stores: {},
+  store: {},
+  storeSections: {},
+  units: {},
   apiCallsInProgress: 0,
   auth: {},
 };

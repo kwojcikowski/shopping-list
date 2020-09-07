@@ -2,16 +2,20 @@ import React from "react";
 import PropTypes from "prop-types";
 import SectionWidget from "./SectionWidget";
 
-const ProductsList = ({ products, sections }) => {
+const ProductsList = ({ productsItems, sectionsItems }) => {
   return (
     <>
       <table className="table">
         <tbody>
-          {sections.map((section) => (
+          {sectionsItems.map((section) => (
             <SectionWidget
-              key={section.id}
-              products={products.filter(
-                (product) => product.section === section.id
+              key={section._links.self.href}
+              productsItems={productsItems.filter(
+                (product) =>
+                  product.section._links.self.href.replace(
+                    "{?projection}",
+                    ""
+                  ) === section._links.self.href.replace("{?projection}", "")
               )}
               section={section}
             />
@@ -23,8 +27,8 @@ const ProductsList = ({ products, sections }) => {
 };
 
 ProductsList.propTypes = {
-  products: PropTypes.array.isRequired,
-  sections: PropTypes.array.isRequired,
+  productsItems: PropTypes.array.isRequired,
+  sectionsItems: PropTypes.array.isRequired,
 };
 
 export default ProductsList;

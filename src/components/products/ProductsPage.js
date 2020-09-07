@@ -1,20 +1,61 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import Spinner from "../common/Spinner";
 import ProductsList from "./ProductsList";
+import { isEmpty } from "underscore";
+import * as sectionsActions from "../../redux/actions/sectionsAction";
+import * as productsActions from "../../redux/actions/productActions";
+import * as unitActions from "../../redux/actions/unitsActions";
+import AddProductWidget from "./product-form/AddProductWidget";
 
+// const ProductsPage = ({
+//   productsItems,
+//   sectionsItems,
+//   apiCallsInProgress,
+//   loadProducts,
+//   loadSections,
+//   loadUnits,
+// }) => {
+//   useEffect(() => {
+//     loadProducts();
+//     loadSections();
+//     loadUnits();
+//   }, []);
+//
+//   return (
+//     <>
+//       {apiCallsInProgress ? (
+//         <Spinner />
+//       ) : (
+//         <>
+//           <ProductsList
+//             productsItems={productsItems}
+//             sectionsItems={sectionsItems}
+//           />
+//         </>
+//       )}
+//     </>
+//   );
+// };
 class ProductsPage extends React.Component {
+  componentDidMount() {
+    this.props.loadSections();
+    this.props.loadProducts();
+    this.props.loadUnits();
+  }
+
   render() {
     return (
       <>
+        <AddProductWidget />
         {this.props.apiCallsInProgress ? (
           <Spinner />
         ) : (
           <>
             <ProductsList
-              products={this.props.products}
-              sections={this.props.sections}
+              productsItems={this.props.productsItems}
+              sectionsItems={this.props.sectionsItems}
             />
           </>
         )}
@@ -24,19 +65,31 @@ class ProductsPage extends React.Component {
 }
 
 ProductsPage.propTypes = {
-  products: PropTypes.array.isRequired,
-  sections: PropTypes.array.isRequired,
+  productsItems: PropTypes.array.isRequired,
+  sectionsItems: PropTypes.array.isRequired,
   apiCallsInProgress: PropTypes.bool.isRequired,
+
+  loadSections: PropTypes.func.isRequired,
+  loadProducts: PropTypes.func.isRequired,
+  loadUnits: PropTypes.func.isRequired,
 };
 
-function mapStateToProps(state) {
+const mapStateToProps = (state) => {
   return {
-    products: state.products,
-    sections: state.sections,
     apiCallsInProgress: state.apiCallsInProgress > 0,
+    productsItems: isEmpty(state.products)
+      ? []
+      : state.products._embedded.products,
+    sectionsItems: isEmpty(state.sections)
+      ? []
+      : state.sections._embedded.sections,
   };
-}
+};
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+  loadSections: sectionsActions.loadSections,
+  loadProducts: productsActions.loadProducts,
+  loadUnits: unitActions.loadUnits,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductsPage);

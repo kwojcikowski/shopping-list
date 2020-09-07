@@ -1,61 +1,39 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import SelectInput from "../common/SelectInput";
-import TextInput from "../common/TextInput";
 import { connect } from "react-redux";
 import * as cartActions from "../../redux/actions/cartActions";
 import * as productActions from "../../redux/actions/productActions";
 import { toast } from "react-toastify";
-import * as smartUnits from "../../tools/smartUnits";
+import Select from "react-select";
+import { isEmpty } from "underscore";
 
 const ProductWidget = ({
-  cart,
   product,
   index,
-  apiCallsInProgress,
+  unitsItems,
   addProductToCart,
-  updateProductInCart,
   deleteProduct,
 }) => {
-  const units = smartUnits.getAvailableUnits();
   const bgColor = index % 2 === 0 ? { backgroundColor: "#EEEEEE" } : {};
 
-  const [cartEntry, setCartEntry] = useState({
-    productId: product.id,
-    unit: product.default_unit,
-    quantity: "0",
+  const [cartCandidate, setCartCandidate] = useState({
+    product: product,
+    unit: product.defaultUnit,
+    quantity: 0,
   });
 
-  const handleOnCartClick = () => {
-    const exists = smartUnits.alreadyExistsInCart(cartEntry, cart);
-    if (exists != null) {
-      const newEntry = smartUnits.evaluateBestUnit(exists, cartEntry);
-      updateProductInCart(newEntry)
-        .then(() => {
-          toast.success(`Produkt ${product.name} dodany do koszyka!`);
-        })
-        .catch(() => {
-          toast.error(`Wystąpił błąd przy dodawaniu do koszyka.`);
-        });
-    } else if (!apiCallsInProgress) {
-      addProductToCart(cartEntry)
-        .then(() => {
-          toast.success(`Produkt ${product.name} dodany do koszyka!`);
-        })
-        .catch(() => {
-          toast.error(`Wystąpił błąd przy dodawaniu do koszyka.`);
-        });
-    } else {
-      toast.info("Wystąpił chwilowy problem. Spróbuj za chwilę.");
-    }
-  };
 
-  const onChangeHandler = (event) => {
-    const { name, value } = event.target;
-    setCartEntry((prevEntry) => ({
-      ...prevEntry,
-      [name]: value,
-    }));
+  const handleOnCartClick = () => {
+    addProductToCart(cartCandidate)
+      .then(() => {
+        toast.success(
+          `Produkt ${cartCandidate.product.name} dodany do koszyka!`
+        );
+      })
+      .catch((e) => {
+        throw e;
+        // toast.error(`Wystąpił błąd przy dodawaniu do koszyka. ${e}`);
+      });
   };
 
   const onProductDelete = () => {
@@ -68,29 +46,55 @@ const ProductWidget = ({
       });
   };
 
+  const onUnitChange = (selectedOption) => {
+    const product = { ...cartCandidate, unit: selectedOption };
+    if (product.quantity !== 0 && product.unit.abbreviation !== "") {
+      setCartCandidate((prev) => ({
+        ...prev,
+        ...product,
+      }));
+    } else {
+      setCartCandidate({
+        ...cartCandidate,
+        unit: selectedOption,
+      });
+    }
+  };
+
+  const onCartCandidateQuantityChange = (event) => {
+    // eslint-disable-next-line no-useless-escape
+    if (
+      event.target.value.match("^[0-9]+[.,]?[0-9]*$") ||
+      event.target.value === ""
+    ) {
+      setCartCandidate({
+        ...cartCandidate,
+        quantity: event.target.value,
+      });
+    }
+  };
+
   return (
     <tr style={bgColor} key={product.id}>
       <td>{product.name}</td>
       <td>
-        <SelectInput
-          label={""}
-          name={"unit"}
-          value={cartEntry.unit}
-          onChange={onChangeHandler}
-          options={units.map((unit) => {
-            return {
-              value: unit,
-              text: unit,
-            };
-          })}
+        <Select
+          name="unit"
+          value={cartCandidate.unit}
+          onChange={onUnitChange}
+          getOptionLabel={(option) => `${option.abbreviation}`}
+          getOptionValue={(option) => `${option.abbreviation}`}
+          options={unitsItems}
         />
       </td>
       <td>
-        <TextInput
-          label={""}
-          onChange={onChangeHandler}
+        <input
+          style={{ margin: "10px", width: "50px" }}
+          onChange={onCartCandidateQuantityChange}
           name={"quantity"}
-          value={cartEntry.quantity}
+          value={cartCandidate.quantity}
+          type="text"
+          // onBlur={onFocusOut}
         />
       </td>
       <td>
@@ -116,23 +120,19 @@ const ProductWidget = ({
 ProductWidget.propTypes = {
   product: PropTypes.object.isRequired,
   index: PropTypes.number.isRequired,
-  cart: PropTypes.array.isRequired,
+  unitsItems: PropTypes.array.isRequired,
   addProductToCart: PropTypes.func.isRequired,
-  updateProductInCart: PropTypes.func.isRequired,
-  apiCallsInProgress: PropTypes.bool.isRequired,
   deleteProduct: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
   return {
-    cart: state.cart,
-    apiCallsInProgress: state.apiCallsInProgress > 0,
+    unitsItems: isEmpty(state.units) ? [] : state.units._embedded.units,
   };
 };
 
 const mapDispatchToProps = {
   addProductToCart: cartActions.addProductToCart,
-  updateProductInCart: cartActions.updateProductInCart,
   deleteProduct: productActions.deleteProduct,
 };
 
