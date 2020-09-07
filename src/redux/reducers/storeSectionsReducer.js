@@ -6,8 +6,8 @@ export default function storeSectionsReducer(
   action
 ) {
   switch (action.type) {
-    case types.LOAD_STORE_SECTIONS_DETAILS_BY_STORE_SUCCESS:
-      return action.storeSectionsDetailsByStore;
+    case types.LOAD_STORE_SECTIONS_BY_STORE_URL_FRIENDLY_NAME_SUCCESS:
+      return action.storeSections;
     default:
       return state;
   }

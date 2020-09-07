@@ -2,8 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import ProductWidget from "./ProductWidget";
 
-const SectionWidget = ({ section, products }) => {
-  if (products.length === 0) return <></>;
+const SectionWidget = ({ section, productsItems }) => {
+  if (productsItems.length === 0) return <></>;
   return (
     <>
       <tr key={section._links.self.href}>
@@ -14,7 +14,7 @@ const SectionWidget = ({ section, products }) => {
         <td>Ilość</td>
         <td>Do koszyka</td>
       </tr>
-      {products.map((product, index) => {
+      {productsItems.map((product, index) => {
         return (
           <ProductWidget
             key={product._links.self.href}
@@ -29,7 +29,7 @@ const SectionWidget = ({ section, products }) => {
 
 SectionWidget.propTypes = {
   section: PropTypes.object.isRequired,
-  products: PropTypes.array.isRequired,
+  productsItems: PropTypes.array.isRequired,
 };
 
 export default SectionWidget;

@@ -1,23 +1,11 @@
 import { handleError, handleResponse } from "./apiUtils";
 const baseUrl = "http://localhost:8080/storeSections";
 
-// export function loadStoreSections() {
-//   return fetch(baseUrl).then(handleResponse).catch(handleError);
-// }
-//
-// export function loadStoreSectionsDetails() {
-//   return fetch(baseUrl + "?projection=StoreSectionDetails")
-//     .then(handleResponse)
-//     .catch(handleError);
-// }
-
-export function loadStoreSectionsDetailsByStore(store) {
+export function loadStoreSectionsByStoreUrlFriendlyName(storeUrlFriendlyName) {
   return fetch(
     baseUrl +
-      `/search/findAllByStore?store=${store}&projection=storeSectionDetails`
+      `/search/findByStore_UrlFriendlyNameOrderByPosition?storeUrlFriendlyName=${storeUrlFriendlyName}`
   )
     .then(handleResponse)
     .catch(handleError);
 }
-
-// TODO add and update

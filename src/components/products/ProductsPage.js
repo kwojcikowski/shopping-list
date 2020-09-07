@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import Spinner from "../common/Spinner";
@@ -6,23 +6,56 @@ import ProductsList from "./ProductsList";
 import { isEmpty } from "underscore";
 import * as sectionsActions from "../../redux/actions/sectionsAction";
 import * as productsActions from "../../redux/actions/productActions";
+import * as unitActions from "../../redux/actions/unitsActions";
+import AddProductWidget from "./product-form/AddProductWidget";
 
+// const ProductsPage = ({
+//   productsItems,
+//   sectionsItems,
+//   apiCallsInProgress,
+//   loadProducts,
+//   loadSections,
+//   loadUnits,
+// }) => {
+//   useEffect(() => {
+//     loadProducts();
+//     loadSections();
+//     loadUnits();
+//   }, []);
+//
+//   return (
+//     <>
+//       {apiCallsInProgress ? (
+//         <Spinner />
+//       ) : (
+//         <>
+//           <ProductsList
+//             productsItems={productsItems}
+//             sectionsItems={sectionsItems}
+//           />
+//         </>
+//       )}
+//     </>
+//   );
+// };
 class ProductsPage extends React.Component {
   componentDidMount() {
     this.props.loadSections();
     this.props.loadProducts();
+    this.props.loadUnits();
   }
 
   render() {
     return (
       <>
+        <AddProductWidget />
         {this.props.apiCallsInProgress ? (
           <Spinner />
         ) : (
           <>
             <ProductsList
-              products={this.props.productsItems}
-              sections={this.props.sectionsItems}
+              productsItems={this.props.productsItems}
+              sectionsItems={this.props.sectionsItems}
             />
           </>
         )}
@@ -38,6 +71,7 @@ ProductsPage.propTypes = {
 
   loadSections: PropTypes.func.isRequired,
   loadProducts: PropTypes.func.isRequired,
+  loadUnits: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -55,6 +89,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
   loadSections: sectionsActions.loadSections,
   loadProducts: productsActions.loadProducts,
+  loadUnits: unitActions.loadUnits,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductsPage);

@@ -1,5 +1,6 @@
 import * as types from "../actions/actionTypes";
 import initialState from "./initialState";
+import {isEmpty} from "underscore";
 
 export default function cartReducer(state = initialState.cart, action) {
   switch (action.type) {
@@ -8,44 +9,53 @@ export default function cartReducer(state = initialState.cart, action) {
       return state.filter((entry) => entry.productId !== action.product.id);
     case types.LOAD_CART_SUCCESS:
       return action.cart;
-    case types.LOAD_CART_ENTRY_SUCCESS:
+    case types.UPDATE_CART_SUCCESS:
       return {
         ...state,
         _embedded: {
           ...state._embedded,
-          cartItems: [...state._embedded.cartItems, action.entry],
+          cartItems: state._embedded.cartItems,
         },
       };
-    case types.UPDATE_CART_SUCCESS:
-      return state;
     case types.ADD_TO_CART_SUCCESS:
-      return state;
-    case types.UPDATE_PRODUCT_IN_CART_SUCCESS:
+      return isEmpty(state) ? {} :
+      {
+        ...state,
+        _embedded: {
+          ...state._embedded,
+          cartItems: state._embedded.cartItems.find(
+            (cartItem) =>
+              cartItem._links.self.href ===
+              action.cartItem.content._links.self.href
+          )
+            ? state._embedded.cartItems.map((cartItem) =>
+                cartItem._links.self.href ===
+                action.cartItem.content._links.self.href
+                  ? action.cartItem.content
+                  : cartItem
+              )
+            : [...state._embedded.cartItems, action.cartItem.content],
+        },
+      }
+    case types.UPDATE_PRODUCT_IN_CART_LOCALLY_SUCCESS:
       return {
         ...state,
         _embedded: {
           ...state._embedded,
-          cartItems: state._embedded.cartItems.map((entry) =>
-            entry._links.self.href === action.cartEntry._links.self.href
-              ? {
-                  ...entry,
-                  quantity: parseFloat(action.cartEntry.quantity),
-                }
-              : entry
+          cartItems: state._embedded.cartItems.map((cartItem) =>
+            cartItem._links.self.href === action.cartItem._links.self.href
+              ? action.cartItem
+              : cartItem
           ),
         },
       };
-    case types.UPDATE_PRODUCT_IN_CART_LOCALLY_SUCCESS:
-      return state.map((entry) =>
-        entry.uid === parseInt(action.cartEntry.uid) ? action.cartEntry : entry
-      );
     case types.DELETE_PRODUCT_FROM_CART_SUCCESS:
       return {
         ...state,
         _embedded: {
           ...state._embedded,
           cartItems: state._embedded.cartItems.filter(
-            (entry) => entry._links.self.href !== action.link
+            (cartItem) => cartItem._links.self.href !== action.cartItemLink
           ),
         },
       };

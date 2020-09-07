@@ -6,24 +6,20 @@ function loadCartSuccess(cart) {
   return { type: types.LOAD_CART_SUCCESS, cart };
 }
 
-function loadCartEntrySuccess(entry) {
-  return { type: types.LOAD_CART_ENTRY_SUCCESS, entry };
+function addProductToCartSuccess(cartItem) {
+  return { type: types.ADD_TO_CART_SUCCESS, cartItem };
 }
 
-function addProductToCartSuccess(cartEntry) {
-  return { type: types.ADD_TO_CART_SUCCESS, cartEntry };
+function updateProductInCartLocallySuccess(cartItem) {
+  return { type: types.UPDATE_PRODUCT_IN_CART_LOCALLY_SUCCESS, cartItem };
 }
 
-function updateProductInCartSuccess(cartEntry) {
-  return { type: types.UPDATE_PRODUCT_IN_CART_SUCCESS, cartEntry };
+function updateCartSuccess(cart) {
+  return { type: types.UPDATE_CART_SUCCESS, cart };
 }
 
-// function updateCartSuccess(cart) {
-//   return { type: types.UPDATE_CART_SUCCESS, cart };
-// }
-
-function deleteProductFromCartSuccess(link) {
-  return { type: types.DELETE_PRODUCT_FROM_CART_SUCCESS, link };
+function deleteProductFromCartSuccess(cartItemLink) {
+  return { type: types.DELETE_PRODUCT_FROM_CART_SUCCESS, cartItemLink };
 }
 
 export function loadCart() {
@@ -41,37 +37,13 @@ export function loadCart() {
   };
 }
 
-// TODO adding without fetching
-export function addProductToCart(cartEntry) {
-  return function (dispatch) {
-    beginApiCall();
-    return cartApi
-      .addProductToCart(cartEntry)
-      .then((cartEntry) => {
-        dispatch(addProductToCartSuccess(cartEntry));
-      })
-      .catch((error) => {
-        dispatch(apiCallError(error));
-        throw error;
-      });
-  };
-}
-
-export function addProductToCartAndFetch(cartEntry) {
+export function addProductToCart(cartItem) {
   return function (dispatch) {
     dispatch(beginApiCall());
     return cartApi
-      .addProductToCart(cartEntry)
-      .then((cartEntry) => {
-        cartApi
-          .getCartEntry(cartEntry._links.self.href)
-          .then((cartEntry) => {
-            dispatch(loadCartEntrySuccess(cartEntry));
-          })
-          .catch((error) => {
-            dispatch(apiCallError(error));
-            throw error;
-          });
+      .addProductToCart(cartItem)
+      .then((cartItem) => {
+        dispatch(addProductToCartSuccess(cartItem));
       })
       .catch((error) => {
         dispatch(apiCallError(error));
@@ -80,13 +52,19 @@ export function addProductToCartAndFetch(cartEntry) {
   };
 }
 
-export function updateProductInCart(cartEntry) {
+export function updateProductInCartLocally(cartItem) {
+  return function (dispatch) {
+    return dispatch(updateProductInCartLocallySuccess(cartItem));
+  };
+}
+
+export function updateCart(cartItems) {
   return function (dispatch) {
     dispatch(beginApiCall());
     return cartApi
-      .updateProductInCart(cartEntry)
-      .then((cartEntry) => {
-        dispatch(updateProductInCartSuccess(cartEntry));
+      .updateCart(cartItems)
+      .then((cartItems) => {
+        dispatch(updateCartSuccess(cartItems));
       })
       .catch((error) => {
         dispatch(apiCallError(error));
@@ -94,27 +72,14 @@ export function updateProductInCart(cartEntry) {
       });
   };
 }
-//
-// export function updateCart(cart) {
-//   return function (dispatch) {
-//     return cartApi
-//       .updateCart(cart)
-//       .then(() => {
-//         dispatch(updateCartSuccess(cart));
-//       })
-//       .catch((error) => {
-//         dispatch(apiCallError(error));
-//         throw error;
-//       });
-//   };
-// }
 
-export function deleteProductFromCart(link) {
+export function deleteProductFromCart(cartItemLink) {
   return function (dispatch) {
+    dispatch(beginApiCall());
     return cartApi
-      .deleteProductFromCart(link)
+      .deleteProductFromCart(cartItemLink)
       .then(() => {
-        dispatch(deleteProductFromCartSuccess(link));
+        dispatch(deleteProductFromCartSuccess(cartItemLink));
       })
       .catch((error) => {
         dispatch(apiCallError(error));

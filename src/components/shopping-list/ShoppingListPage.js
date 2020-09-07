@@ -7,16 +7,13 @@ import { groupBy, sortBy, isEmpty } from "underscore";
 import "./ShoppingListPageStyle.css";
 import * as productsActions from "../../redux/actions/productActions";
 import * as sectionsActions from "../../redux/actions/sectionsAction";
+import * as unitsActions from "../../redux/actions/unitsActions";
 import * as storesActions from "../../redux/actions/storesActions";
 import * as cartActions from "../../redux/actions/cartActions";
 import * as storeSectionsActions from "../../redux/actions/storeSectionsActions";
 import Select from "react-select";
-import {
-  alreadyExistsInCart,
-  evaluateBestUnit,
-  getAvailableUnits,
-} from "../../tools/smartUnits";
 import { toast } from "react-toastify";
+import AddProductWidget from "../products/product-form/AddProductWidget";
 
 const selectStyleName = {
   control: (provided) => ({
@@ -39,23 +36,28 @@ const ShoppingListPage = ({
   productsItems,
   storesItems,
   sectionsItems,
+  unitsItems,
   storeSectionsItems,
   apiCallsInProgress,
-  addProductToCartAndFetch,
-  updateProductInCart,
+  addProductToCart,
+  updateCart,
   loadSections,
+  loadUnits,
   loadProducts,
   loadCartProducts,
   loadStores,
-  loadStoreSectionsDetailsByStore,
+  loadStoreSectionsByStoreUrlFriendlyName,
 }) => {
   const [editable, setEditable] = useState(false);
   const [sortedCartItems, setSortedCartItems] = useState({});
-  const [sortingStore, setSortingStore] = useState(0);
+  const [sortingStore, setSortingStore] = useState("");
   const [candidateProduct, setCandidateProduct] = useState({
-    product: "",
-    name: "",
-    unit: "",
+    product: {
+      name: "",
+    },
+    unit: {
+      abbreviation: "",
+    },
     quantity: 0,
   });
 
@@ -66,6 +68,7 @@ const ShoppingListPage = ({
       loadProducts();
       loadStores();
       loadCartProducts();
+      loadUnits();
     } catch (error) {
       alert("Wystąpił problem z połączeniem.");
     }
@@ -83,15 +86,20 @@ const ShoppingListPage = ({
 
     const groupedCart = groupBy(
       sortBy(cartItems, "_embedded.product.name"),
-      "sectionId"
+      (item) =>
+        item.product.section._links.self.href.replace("{?projection}", "")
     );
-    if (sortingStore === 0) return groupedCart;
+    if (!sortingStore) return groupedCart;
 
     const cartKeys = Object.keys(groupedCart);
     const order = sortBy(storeSectionsItems, "position");
-    for (let section of order) {
-      if (cartKeys.indexOf(section.sectionId.toString()) !== -1) {
-        newSortedCart[section.sectionId] = groupedCart[section.sectionId];
+    for (let storeSection of order) {
+      let sectionLink = storeSection.section._links.self.href.replace(
+        "{?projection}",
+        ""
+      );
+      if (cartKeys.indexOf(sectionLink) !== -1) {
+        newSortedCart[sectionLink] = groupedCart[sectionLink];
       }
     }
     return newSortedCart;
@@ -99,36 +107,35 @@ const ShoppingListPage = ({
 
   const onSelectChange = (event) => {
     const v = event.target.value;
-    loadStoreSectionsDetailsByStore(event.target.value).then(() =>
-      setSortingStore(parseInt(v))
+    loadStoreSectionsByStoreUrlFriendlyName(event.target.value).then(() =>
+      setSortingStore(v)
     );
   };
 
   const onCandidateProductChange = (selectedOption) => {
-    setCandidateProduct(
-      evaluateBestUnit({
-        ...candidateProduct,
-        product: selectedOption._links.self.href,
-        name: selectedOption.name,
-        unit:
-          candidateProduct.unit && candidateProduct.quantity !== 0
-            ? candidateProduct.unit
-            : selectedOption.defaultUnit,
-      })
-    );
+    setCandidateProduct({
+      ...candidateProduct,
+      product: selectedOption,
+      unit:
+        candidateProduct.unit.abbreviation && candidateProduct.quantity !== 0
+          ? candidateProduct.unit
+          : unitsItems.find(
+              (unit) => unit.abbreviation === selectedOption.defaultUnit
+            ),
+    });
   };
 
   const onCandidateProductUnitChange = (selectedOption) => {
-    const product = { ...candidateProduct, ...selectedOption };
-    if (product.quantity !== 0 && product.unit !== "") {
+    const product = { ...candidateProduct, unit: selectedOption };
+    if (product.quantity !== 0 && product.unit.abbreviation !== "") {
       setCandidateProduct((prev) => ({
         ...prev,
-        ...evaluateBestUnit(product),
+        ...product,
       }));
     } else {
       setCandidateProduct({
         ...candidateProduct,
-        ...selectedOption,
+        unit: selectedOption,
       });
     }
   };
@@ -150,11 +157,11 @@ const ShoppingListPage = ({
     event.preventDefault();
     let error = false;
     let messages = [];
-    if (!candidateProduct.product) {
+    if (!candidateProduct.product.name) {
       error = true;
       messages.push("Nie wybrano produktu");
     }
-    if (!candidateProduct.unit) {
+    if (!candidateProduct.unit.abbreviation) {
       error = true;
       messages.push("Nie wybrano jednostki");
     }
@@ -168,66 +175,56 @@ const ShoppingListPage = ({
           {messages.map((m) => (
             <p key={m}>
               <br />
-              {m}
+              {"- " + m}
             </p>
           ))}
         </div>
       );
       return;
     }
-    const toAdd = {
-      product: candidateProduct.product,
-      unit: candidateProduct.unit,
-      quantity: candidateProduct.quantity,
-    };
-    const exists = alreadyExistsInCart(toAdd, cartItems);
-    if (exists != null) {
-      const newEntry = evaluateBestUnit(exists, toAdd);
-      updateProductInCart(newEntry)
-        .then(
-          toast.success(`Produkt ${candidateProduct.name} dodany do koszyka!`)
+    addProductToCart(candidateProduct)
+      .then(
+        toast.success(
+          `Produkt ${candidateProduct.product.name} dodany do koszyka!`
         )
-        .catch((error) =>
-          toast.error("Dodawanie produktu do koszyka nie powiodło się." + error)
-        );
-    } else {
-      addProductToCartAndFetch(toAdd)
-        .then(
-          toast.success(`Produkt ${candidateProduct.name} dodany do koszyka!`)
-        )
-        .catch(() =>
-          toast.error("Dodawanie produktu do koszyka nie powiodło się.")
-        );
-    }
+      )
+      .catch(() =>
+        toast.error("Dodawanie produktu do koszyka nie powiodło się.")
+      );
   };
 
-  const onFocusOut = () => {
-    let quantity = candidateProduct.quantity.toString();
-    if (quantity === "") {
-      setCandidateProduct((prevValue) => ({ ...prevValue, quantity: 0 }));
-      return;
-    }
-    // Checking if . or , at the end of field
-    if (quantity.match("/^[0-9]+[.,]$/")) {
-      quantity = quantity.replace("[,.]", "");
-    }
-    quantity = parseFloat(quantity.replace(",", "."));
-    if (candidateProduct.unit === "") {
-      setCandidateProduct((prevValue) => ({ ...prevValue, quantity }));
-    } else {
-      const newProduct = evaluateBestUnit({
-        ...candidateProduct,
-        quantity,
-      });
-      if (JSON.stringify(newProduct) !== JSON.stringify(candidateProduct)) {
-        setCandidateProduct((prevValue) => ({
-          ...prevValue,
-          ...newProduct,
-          quantity: newProduct.quantity.toString(),
-        }));
-      }
-    }
+  const onListSave = () => {
+    if (editable) updateCart(cartItems);
+    setEditable(!editable);
   };
+
+  // const onFocusOut = () => {
+  //   let quantity = candidateProduct.quantity.toString();
+  //   if (quantity === "") {
+  //     setCandidateProduct((prevValue) => ({ ...prevValue, quantity: 0 }));
+  //     return;
+  //   }
+  //   // Checking if . or , at the end of field
+  //   if (quantity.match("/^[0-9]+[.,]$/")) {
+  //     quantity = quantity.replace("[,.]", "");
+  //   }
+  //   quantity = parseFloat(quantity.replace(",", "."));
+  //   if (candidateProduct.unit === "") {
+  //     setCandidateProduct((prevValue) => ({ ...prevValue, quantity }));
+  //   } else {
+  //     const newProduct = {
+  //       ...candidateProduct,
+  //       quantity,
+  //     };
+  //     if (JSON.stringify(newProduct) !== JSON.stringify(candidateProduct)) {
+  //       setCandidateProduct((prevValue) => ({
+  //         ...prevValue,
+  //         ...newProduct,
+  //         quantity: newProduct.quantity.toString(),
+  //       }));
+  //     }
+  //   }
+  // };
 
   return (
     <div className="list">
@@ -240,8 +237,8 @@ const ShoppingListPage = ({
             {storesItems.map((store) => {
               return (
                 <option
-                  key={store._links.self.href}
-                  value={store._links.self.href}
+                  key={store.urlFriendlyName}
+                  value={store.urlFriendlyName}
                 >
                   {store.name}
                 </option>
@@ -251,7 +248,7 @@ const ShoppingListPage = ({
         </div>
         <button
           className="btn btn-outline-primary editButton"
-          onClick={() => setEditable(!editable)}
+          onClick={onListSave}
         >
           {editable ? "Zapisz" : "Edytuj listę zakupów"}
         </button>
@@ -269,10 +266,10 @@ const ShoppingListPage = ({
             <Select
               name="id"
               styles={selectStyleName}
-              value={candidateProduct}
+              value={candidateProduct.product}
               onChange={onCandidateProductChange}
               getOptionLabel={(option) => `${option.name}`}
-              getOptionValue={(option) => `${option.product}`}
+              getOptionValue={(option) => `${option.name}`}
               options={productsItems}
             />
             <input
@@ -281,16 +278,16 @@ const ShoppingListPage = ({
               name={"quantity"}
               value={candidateProduct.quantity}
               type="text"
-              onBlur={onFocusOut}
+              // onBlur={onFocusOut} //TODO to be implemented
             />
             <Select
               name="unit"
-              value={candidateProduct}
+              value={candidateProduct.unit}
               styles={selectStyleUnit}
               onChange={onCandidateProductUnitChange}
-              getOptionLabel={(option) => `${option.unit}`}
-              getOptionValue={(option) => `${option.unit}`}
-              options={getAvailableUnits().map((unit) => ({ unit }))}
+              getOptionLabel={(option) => `${option.abbreviation}`}
+              getOptionValue={(option) => `${option.abbreviation}`}
+              options={unitsItems}
             />
             <button type="submit" className="btn btn-outline-success">
               Dodaj do listy
@@ -304,12 +301,16 @@ const ShoppingListPage = ({
       {apiCallsInProgress ? (
         <Spinner />
       ) : (
-        Object.keys(sortedCartItems).map((sectionId) => {
+        Object.keys(sortedCartItems).map((sectionLink) => {
           return (
             <ShoppingSectionWidget
-              key={sectionId}
-              section={sectionsItems[sectionId - 1].name}
-              cartItems={sortedCartItems[sectionId]}
+              key={sectionLink}
+              section={
+                sectionsItems.find(
+                  (section) => section._links.self.href === sectionLink
+                ).name
+              }
+              cartItems={sortedCartItems[sectionLink]}
               editable={editable}
             />
           );
@@ -324,15 +325,17 @@ ShoppingListPage.propTypes = {
   storesItems: PropTypes.array.isRequired,
   productsItems: PropTypes.array.isRequired,
   sectionsItems: PropTypes.array.isRequired,
+  unitsItems: PropTypes.array.isRequired,
   storeSectionsItems: PropTypes.array.isRequired,
   apiCallsInProgress: PropTypes.bool.isRequired,
-  addProductToCartAndFetch: PropTypes.func.isRequired,
-  updateProductInCart: PropTypes.func.isRequired,
-  loadStoreSectionsDetailsByStore: PropTypes.func.isRequired,
+  addProductToCart: PropTypes.func.isRequired,
+  updateCart: PropTypes.func.isRequired,
   loadSections: PropTypes.func.isRequired,
+  loadUnits: PropTypes.func.isRequired,
   loadProducts: PropTypes.func.isRequired,
   loadCartProducts: PropTypes.func.isRequired,
   loadStores: PropTypes.func.isRequired,
+  loadStoreSectionsByStoreUrlFriendlyName: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -346,6 +349,7 @@ const mapStateToProps = (state) => {
     sectionsItems: isEmpty(state.sections)
       ? []
       : state.sections._embedded.sections,
+    unitsItems: isEmpty(state.units) ? [] : state.units._embedded.units,
     storeSectionsItems: isEmpty(state.storeSections)
       ? []
       : state.storeSections._embedded.storeSections,
@@ -353,14 +357,15 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-  addProductToCartAndFetch: cartActions.addProductToCartAndFetch,
-  updateProductInCart: cartActions.updateProductInCart,
+  addProductToCart: cartActions.addProductToCart,
+  updateCart: cartActions.updateCart,
   loadSections: sectionsActions.loadSections,
+  loadUnits: unitsActions.loadUnits,
   loadProducts: productsActions.loadProducts,
   loadCartProducts: cartActions.loadCart,
   loadStores: storesActions.loadStores,
-  loadStoreSectionsDetailsByStore:
-    storeSectionsActions.loadStoreSectionsDetailsByStore,
+  loadStoreSectionsByStoreUrlFriendlyName:
+    storeSectionsActions.loadStoreSectionsByStoreUrlFriendlyName,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ShoppingListPage);

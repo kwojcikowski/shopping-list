@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import ShoppingProductWidget from "./ShoppingProductWidget";
 import * as cartActions from "../../redux/actions/cartActions";
 import { connect } from "react-redux";
-import { mapToUnit } from "../../tools/smartUnits";
 import { toast } from "react-toastify";
 
 const ShoppingSectionWidget = ({
@@ -43,7 +42,7 @@ const ShoppingSectionWidget = ({
                   <td className={"listColumn"}>{cartItem.product.name}</td>
                   <td className={"listColumn"}>
                     {cartItem.quantity + " "}
-                    {mapToUnit(cartItem.unit)}
+                    {cartItem.unit.abbreviation}
                   </td>
                 </tr>
               );

@@ -3,6 +3,8 @@ export default {
   sections: {},
   cart: {},
   stores: {},
+  store: {},
   storeSections: {},
+  units: {},
   apiCallsInProgress: 0,
 };

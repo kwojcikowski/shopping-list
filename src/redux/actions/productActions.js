@@ -6,8 +6,8 @@ function loadProductsSuccess(products) {
   return { type: types.LOAD_PRODUCTS_SUCCESS, products };
 }
 
-function saveProductSuccess(product) {
-  return { type: types.SAVE_PRODUCT_SUCCESS, product };
+function addProductSuccess(product) {
+  return { type: types.ADD_PRODUCT_SUCCESS, product };
 }
 
 function deleteProductSuccess(product) {
@@ -29,13 +29,13 @@ export function loadProducts() {
   };
 }
 
-export function saveProduct(product) {
+export function addProduct(product) {
   return function (dispatch) {
     dispatch(beginApiCall());
     return productApi
-      .saveProduct(product)
+      .addProduct(product)
       .then((product) => {
-        dispatch(saveProductSuccess(product));
+        dispatch(addProductSuccess(product));
       })
       .catch((error) => {
         dispatch(apiCallError(error));

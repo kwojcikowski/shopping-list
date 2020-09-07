@@ -10,10 +10,12 @@ const ProductsList = ({ productsItems, sectionsItems }) => {
           {sectionsItems.map((section) => (
             <SectionWidget
               key={section._links.self.href}
-              products={productsItems.filter(
+              productsItems={productsItems.filter(
                 (product) =>
-                  product.section._links.section.href ===
-                  section._links.section.href
+                  product.section._links.self.href.replace(
+                    "{?projection}",
+                    ""
+                  ) === section._links.self.href.replace("{?projection}", "")
               )}
               section={section}
             />

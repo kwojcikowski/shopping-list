@@ -1,42 +1,60 @@
 import React, { useEffect, useState } from "react";
-import InlineSelectInput from "../common/InlineSelectInput";
-import { getAvailableUnits, evaluateBestUnit } from "../../tools/smartUnits";
-import InlineTextInput from "../common/InlineTextInput";
 import * as cartActions from "../../redux/actions/cartActions";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { FaTrashAlt } from "react-icons/fa";
+import { isEmpty, isMatch } from "underscore";
+import Select from "react-select";
+
+const selectStyleUnit = {
+  control: (provided) => ({
+    ...provided,
+    width: 80,
+    margin: "10px",
+  }),
+};
 
 const ShoppingProductWidget = ({
   cartItem,
-  updateProductInCart,
+  unitsItems,
+  updateProductInCartLocally,
   deleteProductFromCart,
 }) => {
-  const [cartProduct, setCartProduct] = useState(evaluateBestUnit(cartItem));
+  const [cartProduct, setCartProduct] = useState(cartItem);
 
   useEffect(() => {
-    setCartProduct((prevProduct) =>
-      evaluateBestUnit({
+    setCartProduct((prevProduct) => {
+      return {
         ...prevProduct,
         ...cartItem,
-      })
-    );
+      };
+    });
   }, [cartItem]);
 
-  const onChangeHandler = (event) => {
-    const { name, value } = event.target;
-    const newEntry = {
+  const onUnitChange = (selectedOption) => {
+    setCartProduct({
       ...cartProduct,
-      [name]: name === "quantity" ? parseInt(value) : value,
-    };
-    setCartProduct(newEntry);
+      unit: selectedOption,
+    });
+  };
+
+  const onQuantityChange = (event) => {
+    // eslint-disable-next-line no-useless-escape
+    if (
+      event.target.value.match("^[0-9]+[.,]?[0-9]*$") ||
+      event.target.value === ""
+    ) {
+      setCartProduct({
+        ...cartProduct,
+        quantity: parseFloat(event.target.value),
+      });
+    }
   };
 
   const onFocusOut = () => {
-    if (JSON.stringify(cartProduct) !== JSON.stringify(cartItem)) {
-      const newProduct = evaluateBestUnit(cartProduct);
-      setCartProduct(evaluateBestUnit(newProduct));
-      updateProductInCart(newProduct);
+    if (!isMatch(cartProduct, cartItem)) {
+      setCartProduct(cartProduct);
+      updateProductInCartLocally(cartProduct);
     }
   };
 
@@ -44,20 +62,25 @@ const ShoppingProductWidget = ({
     <tr key={cartProduct.product._links.self.href} className={"listRow"}>
       <td className={"listColumn"}>{cartProduct.product.name}</td>
       <td>
-        <InlineTextInput
-          onChange={onChangeHandler}
+        <input
+          style={{ margin: "10px", width: "50px" }}
+          onChange={onQuantityChange}
           name={"quantity"}
           value={cartProduct.quantity}
-          onFocusOut={onFocusOut}
+          type="text"
+          onBlur={onFocusOut}
         />
       </td>
       <td>
-        <InlineSelectInput
-          name={"unit"}
-          onChange={onChangeHandler}
+        <Select
+          name="unit"
+          style={selectStyleUnit}
           value={cartProduct.unit}
-          defaultOption={cartProduct.unit}
-          options={getAvailableUnits()}
+          onChange={onUnitChange}
+          defaultOption={cartProduct.unit.abbreviation}
+          getOptionLabel={(option) => `${option.abbreviation}`}
+          getOptionValue={(option) => `${option.abbreviation}`}
+          options={unitsItems}
           onBlur={onFocusOut}
         />
       </td>
@@ -75,16 +98,19 @@ const ShoppingProductWidget = ({
 
 ShoppingProductWidget.propTypes = {
   cartItem: PropTypes.object.isRequired,
-  updateProductInCart: PropTypes.func.isRequired,
+  unitsItems: PropTypes.array.isRequired,
+  updateProductInCartLocally: PropTypes.func.isRequired,
   deleteProductFromCart: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = () => {
-  return {};
+const mapStateToProps = (state) => {
+  return {
+    unitsItems: isEmpty(state.units) ? [] : state.units._embedded.units,
+  };
 };
 
 const mapDispatchToProps = {
-  updateProductInCart: cartActions.updateProductInCart,
+  updateProductInCartLocally: cartActions.updateProductInCartLocally,
 };
 
 export default connect(
