@@ -1,0 +1,9 @@
+[submodule "shopping-list-react"]
+	path = shopping-list-react
+	url = https://github.com/kwojcikowski/shopping-list-react
+[submodule "image-scraper"]
+	path = image-scraper
+	url = https://github.com/kwojcikowski/image-scraper
+[submodule "shopping-list-api"]
+	path = shopping-list-api
+	url = https://github.com/kwojcikowski/shopping-list-api
