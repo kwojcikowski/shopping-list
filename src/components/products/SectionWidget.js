@@ -10,9 +10,9 @@ const SectionWidget = ({ section, productsItems }) => {
         <td key={section._links.self.href}>
           <h3 key={section._links.self.href}>{section.name}</h3>
         </td>
-        <td>Jednostka</td>
-        <td>Ilość</td>
-        <td>Do koszyka</td>
+        {/*<td>Jednostka</td>*/}
+        {/*<td>Ilość</td>*/}
+        {/*<td>Do koszyka</td>*/}
       </tr>
       {productsItems.map((product, index) => {
         return (

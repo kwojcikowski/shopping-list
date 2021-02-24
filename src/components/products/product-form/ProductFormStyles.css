@@ -1,99 +1,111 @@
 .windowContainer {
-    top: 0;
-    left: 0;
-    position: fixed;
-    height: 100vh;
-    width: 100vw;
-    background-color: rgba(100, 100, 100, 0.8);
-    backdrop-filter: blur(2px) grayscale(100%);
-    transition: all .3s linear;
-    z-index: 1;
+  top: 0;
+  left: 0;
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(100, 100, 100, 0.8);
+  backdrop-filter: blur(2px) grayscale(100%);
+  transition: all 0.3s linear;
+  z-index: 1;
 }
 
-.windowContainerHidden{
-    left: -100vw;
+.windowContainerHidden {
+  left: -100vw;
 }
 
-.productFormContainer{
-    height: 50vh;
-    width: 50vw;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    transition-property: all;
-    transition-duration: .7s;
-    transition-timing-function: ease-in-out;
-    text-align: center;
-    justify-content: center;
-    display: flex;
-    z-index: 2;
+.productFormContainer {
+  height: 80vh;
+  width: 80vw;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition-property: all;
+  transition-duration: 0.7s;
+  transition-timing-function: ease-in-out;
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  z-index: 2;
 }
 
-.productFormHidden{
-    left: 0;
-    transform: translate(-44vw) translate(0, -50%);
+.productFormHidden {
+  left: 0;
+  transform: translate(0, -50%) translate(-71vw);
 }
 
-.productFormDiv{
-    outline: 2px solid dodgerblue;
-    float: left;
-    width: 90%;
-    height: 100%;
-    background-color: whitesmoke;
+.productFormDiv {
+  outline: 2px solid dodgerblue;
+  float: left;
+  width: 90%;
+  height: 100%;
+  background-color: whitesmoke;
 }
 
-.clear{
-    clear: both;
+.formContent {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-.labelDiv{
-    height: 100%;
-    width: 10%;
-    float: right;
-    background-color: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+.clear {
+  clear: both;
 }
 
-.label{
-    border-top: 2px solid dodgerblue;
-    border-right: 2px solid dodgerblue;
-    border-bottom: 2px solid dodgerblue;
-    background-color: whitesmoke;
-    width: 100%;
+.labelDiv {
+  height: 100%;
+  width: 10%;
+  float: right;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-.formContent{
-    position: relative;
-    top:50%;
-    transform: translateY(-50%);
+.label {
+  border-top: 2px solid dodgerblue;
+  border-right: 2px solid dodgerblue;
+  border-bottom: 2px solid dodgerblue;
+  background-color: whitesmoke;
+  width: 100%;
 }
 
-.productForm{
-    margin-top: 5vh
+.productNameInput {
+  width: 60%;
+  margin-left: 20%;
+  margin-right: 20%;
 }
 
-.productNameInput{
-    width: 60%;
-    margin-left: 20%;
-    margin-right: 20%;
+.defaultUnitSelectDiv {
+  width: 20%;
+  margin-left: 20%;
+  float: left;
+  margin-top: 2vh;
+  margin-bottom: 2vh;
 }
 
-.defaultUnitSelectDiv{
-    width: 20%;
-    margin-left: 20%;
-    float: left;
-    margin-top: 2vh;
-    margin-bottom: 3vh;
+.sectionSelectDiv {
+  width: 35%;
+  margin-right: 20%;
+  margin-top: 2vh;
+  margin-bottom: 2vh;
+  float: right;
 }
 
-.sectionSelectDiv{
-    width: 35%;
-    margin-right: 20%;
-    margin-top: 2vh;
-    margin-bottom: 3vh;
-    float: right;
+.imagesContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.imageWrapper {
+  width: 150px;
+  height: 150px;
+  background: rgba(0, 0, 0, 0.05);
+  margin: 0 5px 1vh 5px;
+}
+
+.selectedImage {
+  border: 2px solid dodgerblue;
 }

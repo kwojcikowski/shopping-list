@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import * as cartActions from "../../redux/actions/cartActions";
@@ -6,6 +6,8 @@ import * as productActions from "../../redux/actions/productActions";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import { isEmpty } from "underscore";
+import { handleResponse } from "../../api/apiUtils";
+import ProgressiveImageContainer from "../common/ProgressiveImageContainer";
 
 const ProductWidget = ({
   product,
@@ -22,6 +24,46 @@ const ProductWidget = ({
     quantity: 0,
   });
 
+  const [image, setImage] = useState({
+    src: "",
+    thumb: "",
+    width: "",
+    height: "",
+  });
+
+  const progressiveImageWrapperStyle = {
+    width: "100px",
+    height: "100px",
+    background: "rgba(0, 0, 0, 0.05)",
+    margin: "0 5px 1vh 5px",
+  };
+
+  const loadImages = async () => {
+    //First load thumb to support lazy loading
+    const thumbnailImage = await fetch(product._links.thumbImage.href).then(
+      handleResponse
+    );
+    if (thumbnailImage)
+      setImage({
+        ...image,
+        thumb: "data:image/png;base64," + thumbnailImage.image,
+      });
+
+    const fullImage = await fetch(product._links.image.href).then(
+      handleResponse
+    );
+    if (fullImage)
+      setImage({
+        ...image,
+        width: fullImage.width,
+        height: fullImage.height,
+        src: "data:image/png;base64," + fullImage.image,
+      });
+  };
+
+  useEffect(() => {
+    loadImages();
+  }, []);
 
   const handleOnCartClick = () => {
     addProductToCart(cartCandidate)
@@ -76,6 +118,18 @@ const ProductWidget = ({
 
   return (
     <tr style={bgColor} key={product.id}>
+      <td>
+        <div style={progressiveImageWrapperStyle}>
+          <ProgressiveImageContainer
+            src={image.src}
+            width={image.width}
+            height={image.height}
+            thumb={image.thumb}
+            containerWidth={progressiveImageWrapperStyle.width}
+            containerHeight={progressiveImageWrapperStyle.height}
+          />
+        </div>
+      </td>
       <td>{product.name}</td>
       <td>
         <Select
@@ -103,14 +157,6 @@ const ProductWidget = ({
           onClick={handleOnCartClick}
         >
           Dodaj do koszyka
-        </button>
-      </td>
-      <td>
-        <button
-          className="btn btn-sm btn-outline-danger"
-          onClick={onProductDelete}
-        >
-          Usuń produkt
         </button>
       </td>
     </tr>

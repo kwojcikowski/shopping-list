@@ -9,35 +9,6 @@ import * as productsActions from "../../redux/actions/productActions";
 import * as unitActions from "../../redux/actions/unitsActions";
 import AddProductWidget from "./product-form/AddProductWidget";
 
-// const ProductsPage = ({
-//   productsItems,
-//   sectionsItems,
-//   apiCallsInProgress,
-//   loadProducts,
-//   loadSections,
-//   loadUnits,
-// }) => {
-//   useEffect(() => {
-//     loadProducts();
-//     loadSections();
-//     loadUnits();
-//   }, []);
-//
-//   return (
-//     <>
-//       {apiCallsInProgress ? (
-//         <Spinner />
-//       ) : (
-//         <>
-//           <ProductsList
-//             productsItems={productsItems}
-//             sectionsItems={sectionsItems}
-//           />
-//         </>
-//       )}
-//     </>
-//   );
-// };
 class ProductsPage extends React.Component {
   componentDidMount() {
     this.props.loadSections();
