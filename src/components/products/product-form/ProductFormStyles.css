@@ -1,0 +1,47 @@
+.product-form {
+  margin: 30px auto;
+  text-align: center;
+}
+
+.np-input-wrapper {
+  width: 50%;
+}
+
+.np-unit-wrapper {
+  width: 200px;
+}
+
+.np-unit-select {
+  width: auto;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+.np-section-wrapper {
+  width: 35%;
+}
+
+.np-image-wrapper {
+
+}
+
+.np-input-wrapper, .np-unit-wrapper, .np-section-wrapper, .np-image-wrapper {
+  display: block;
+  margin: 30px auto;
+}
+
+.imagesContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.imageWrapper {
+  width: 150px;
+  height: 150px;
+  background: rgba(0, 0, 0, 0.05);
+  margin: 0 5px 1vh 5px;
+}
+
+.selectedImage {
+  border: 2px solid #28a745;
+}

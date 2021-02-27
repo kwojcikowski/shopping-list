@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./ProductFormStyles.css";
 import { connect } from "react-redux";
 import { isEmpty } from "underscore";
 import Select from "react-select";
@@ -8,12 +7,15 @@ import { toast } from "react-toastify";
 import * as productActions from "../../../redux/actions/productActions";
 import { handleResponse } from "../../../api/apiUtils";
 import ImageContainer from "./ImageContainer";
+import {Button, Form} from "react-bootstrap";
+import "./ProductFormStyles.css";
+import SectionSelect from "../../common/product/SectionSelect";
 
 const ProductForm = ({ unitsItems, sectionsItems, addNewProduct }) => {
   const [newProduct, setNewProduct] = useState({
     name: "",
-    defaultUnitAbbreviation: "",
-    sectionId: 0,
+    unit: {},
+    section: {},
     imageUrl: "",
   });
 
@@ -58,11 +60,11 @@ const ProductForm = ({ unitsItems, sectionsItems, addNewProduct }) => {
       error = true;
       messages.push("Nie wpisano nazwy produktu");
     }
-    if (!newProduct.defaultUnitAbbreviation) {
+    if (!newProduct.unit) {
       error = true;
       messages.push("Nie wybrano jednostki");
     }
-    if (!newProduct.sectionId) {
+    if (!newProduct.section) {
       error = true;
       messages.push("Nie wybrano działu");
     }
@@ -84,7 +86,12 @@ const ProductForm = ({ unitsItems, sectionsItems, addNewProduct }) => {
       );
       return;
     }
-    addNewProduct(newProduct)
+    addNewProduct({
+      name: newProduct.name,
+      defaultUnitAbbreviation: newProduct.unit.abbreviation,
+      sectionId: newProduct.section.id,
+      imageUrl: newProduct.imageUrl
+    })
       .then(
         toast.success(
           `Produkt ${newProduct.name} został poprawnie dodany!`
@@ -93,28 +100,28 @@ const ProductForm = ({ unitsItems, sectionsItems, addNewProduct }) => {
       .catch(() => toast.error("Dodawanie produktu nie powiodło się."));
   };
 
-  const onNewProductNameChange = (event) => {
+  const onNameChange = (event) => {
     setNewProduct({
       ...newProduct,
       name: event.target.value
     });
   };
 
-  const onNewProductDefaultUnitChange = (selectedUnit) => {
+  const onUnitChange = (selectedUnit) => {
     setNewProduct({
       ...newProduct,
-      defaultUnitAbbreviation: selectedUnit.abbreviation,
+      unit: selectedUnit,
     });
   };
 
-  const onNewProductSectionChange = (selectedSection) => {
+  const onSectionChange = (selectedSection) => {
     setNewProduct({
       ...newProduct,
-      sectionId: selectedSection.id,
+      section: selectedSection,
     });
   };
 
-  const onNewProductImageChange = (imageUrl) => {
+  const onImageChange = (imageUrl) => {
     setNewProduct({
       ...newProduct,
       imageUrl: imageUrl,
@@ -122,73 +129,57 @@ const ProductForm = ({ unitsItems, sectionsItems, addNewProduct }) => {
   };
 
   return (
-    <div className="productFormDiv">
-      <div className="formContent">
-        <h3>Dodaj nowy produkt</h3>
-        <form onSubmit={onNewProductSubmit} className="productForm">
-          <label>Nazwa produktu</label>
-          <input
-            name="productName"
-            className="productNameInput"
-            onChange={onNewProductNameChange}
-            value={newProduct.name}
-            type="text"
-            onBlur={fetchProductImages}
-          />
-          <div className="defaultUnitSelectDiv">
-            <label>Domyślna jednostka</label>
-            <Select
-              name="unit"
-              value={newProduct.defaultUnit}
-              onChange={onNewProductDefaultUnitChange}
-              getOptionLabel={(option) => `${option.abbreviation}`}
-              getOptionValue={(option) => `${option.abbreviation}`}
+      <Form className="product-form">
+        <div className="np-input-wrapper">
+          <Form.Label>Nazwa produktu</Form.Label>
+          <Form.Control as="input" onBlur={fetchProductImages} onChange={onNameChange} value={newProduct.name}/>
+        </div>
+        <div className="np-unit-wrapper">
+        <Form.Label>Domyślna jednostka</Form.Label>
+          <Select
+              onChange={onUnitChange}
               options={unitsItems}
-            />
-          </div>
-          <div className="sectionSelectDiv">
-            <label>Dział</label>
-            <Select
-              name="section"
-              value={newProduct.section}
-              onChange={onNewProductSectionChange}
-              getOptionLabel={(option) => `${option.name}`}
-              getOptionValue={(option) => `${option.name}`}
-              options={sectionsItems}
-            />
-          </div>
-          <div className="clear" />
-          <label>Wybierz zdjęcie najlepiej ukazujące Twój produkt:</label>
-          <div className="imagesContainer">
-            {images.map((image, index) =>
-              image ? (
-                <div
-                  className="imageWrapper"
-                  style={
-                    newProduct.imageUrl === image.url
-                      ? { border: "2px solid dodgerblue" }
-                      : {}
-                  }
-                  key={image.url}
-                  onClick={() => onNewProductImageChange(image.url)}
-                >
-                  <ImageContainer
-                    src={image.url}
-                    width={image.width}
-                    height={image.height}
-                  />
+              getOptionLabel={(option) => `${option.abbreviation}`}
+              getOptionValue={(option) => option.abbreviation}
+              placeholder={<div>Wybierz jednostkę</div>}
+              />
+        </div>
+        <div className="np-section-wrapper">
+        <Form.Label>Dział</Form.Label>
+        <SectionSelect
+            sectionsItems={sectionsItems}
+            onSectionChange={onSectionChange}
+        />
+        </div>
+        <div className="np-image-wrapper">
+        <Form.Label>Wybierz zdjęcie najlepiej ukazujące produkt:</Form.Label>
+        <div className="imagesContainer">
+                   {images.map((image, index) =>
+                    image ? (
+                      <div
+                        className="imageWrapper"
+                        style={
+                          newProduct.imageUrl === image.url
+                            ? { border: "2px solid dodgerblue" }
+                            : {}
+                        }
+                        key={image.url}
+                        onClick={() => onImageChange(image.url)}
+                      >
+                        <ImageContainer
+                          src={image.url}
+                          width={image.width}
+                          height={image.height}
+                        />
+                      </div>
+                    ) : (
+                      <div className="imageWrapper" key={index} />
+                    )
+                  )}
                 </div>
-              ) : (
-                <div className="imageWrapper" key={index} />
-              )
-            )}
-          </div>
-          <button type="submit" className="btn btn-outline-success">
-            Dodaj produkt
-          </button>
-        </form>
-      </div>
-    </div>
+        </div>
+        <Button variant="success" type="submit" onClick={onNewProductSubmit}>Dodaj produkt</Button>
+      </Form>
   );
 };
 

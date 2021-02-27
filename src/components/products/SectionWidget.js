@@ -1,35 +1,29 @@
 import React from "react";
 import PropTypes from "prop-types";
 import ProductWidget from "./ProductWidget";
+import {Row} from "react-flexbox-grid";
+import "./SectionWidgetStyle.css"
 
-const SectionWidget = ({ section, productsItems }) => {
-  if (productsItems.length === 0) return <></>;
-  return (
-    <>
-      <tr key={section._links.self.href}>
-        <td key={section._links.self.href}>
-          <h3 key={section._links.self.href}>{section.name}</h3>
-        </td>
-        {/*<td>Jednostka</td>*/}
-        {/*<td>Ilość</td>*/}
-        {/*<td>Do koszyka</td>*/}
-      </tr>
-      {productsItems.map((product, index) => {
-        return (
-          <ProductWidget
-            key={product._links.self.href}
-            product={product}
-            index={index}
-          />
-        );
-      })}
-    </>
-  );
+const SectionWidget = ({section, productsItems}) => {
+    if (productsItems.length === 0) return <></>;
+    return (
+        <div className="section-widget">
+            <h2 className="section-widget-title">{section.name}</h2>
+            <Row>
+                {productsItems.map(product =>
+                    <ProductWidget
+                        key={product.id}
+                        product={product}
+                    />
+                )}
+            </Row>
+        </div>
+    );
 };
 
 SectionWidget.propTypes = {
-  section: PropTypes.object.isRequired,
-  productsItems: PropTypes.array.isRequired,
+    section: PropTypes.object.isRequired,
+    productsItems: PropTypes.array.isRequired,
 };
 
 export default SectionWidget;
